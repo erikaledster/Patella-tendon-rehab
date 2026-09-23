@@ -1,11 +1,9 @@
 {
-  "name":"Right Patellar Tendon Rehab",
-  "short_name":"Patellar Rehab",
-  "start_url":"./",
+  "name":"Patella Rehab",
+  "short_name":"Patella Rehab",
+  "start_url":"./index.html",
   "display":"standalone",
-  "background_color":"#f5f7fb",
-  "theme_color":"#111827",
-  "icons":[
-    {"src":"icon.png","sizes":"180x180","type":"image/png","purpose":"any maskable"}
-  ]
+  "background_color":"#fdf7fa",
+  "theme_color":"#8f174f",
+  "icons":[{"src":"icon.png","sizes":"192x192","type":"image/png"}]
 }

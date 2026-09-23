@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111827">
+<meta name="theme-color" content="#8f174f">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.png">
 <title>Patellar Rehab</title>
 <style>
-:root{--bg:#f5f7fb;--card:#fff;--text:#111827;--muted:#667085;--line:#e5e7eb;--accent:#2563eb;--good:#15803d;--warn:#b45309;--bad:#b91c1c;--purple:#7c3aed}
+:root{--bg:#fdf7fa;--card:#fff;--text:#2a1821;--muted:#735c67;--line:#ead7df;--accent:#8f174f;--good:#15803d;--warn:#b45309;--bad:#b91c1c;--purple:#7c3aed}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;padding-bottom:90px}
-header{background:#111827;color:#fff;padding:18px 18px 20px;position:sticky;top:0;z-index:10}header h1{margin:0;font-size:22px}header p{margin:5px 0 0;color:#cbd5e1;font-size:13px}
+header{background:#8f174f;color:#fff;padding:18px 18px 20px;position:sticky;top:0;z-index:10}header h1{margin:0;font-size:22px}header p{margin:5px 0 0;color:#cbd5e1;font-size:13px}
 nav{display:flex;gap:7px;overflow:auto;padding:10px 12px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:73px;z-index:9}
 nav button{border:0;background:#eef2f7;border-radius:10px;padding:9px 13px;font-weight:700;white-space:nowrap;color:#374151}nav button.active{background:var(--accent);color:#fff}
 main{max-width:760px;margin:auto;padding:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 1px 2px #00000008}
@@ -31,46 +31,52 @@ canvas{width:100%;height:190px;border:1px solid var(--line);border-radius:12px;b
 </style>
 </head>
 <body>
-<header><h1>Right Patellar Tendon Rehab</h1><p>Home rehab → gym strength → running → rugby return</p></header>
+<header><h1>Patella Rehab</h1><p>Home rehab → gym strength → running → rugby return</p></header>
 <nav id="nav"></nav>
 <main id="app"></main>
 <div class="footer">This tracker supports your rehab plan; it does not replace your physio. Follow your physio's advice, especially before running, jumping, sprinting or returning to rugby.</div>
 <script>
 const homeStart="2026-09-28";
 const weeks={
+"0.5":{goal:"Bridge into Week 1",days:[
+["Wednesday 23 Sep","Session 1 — Today",[["Warm-up walk","5–8 min easy","—"],["Wall sit","3 × 30 sec","90 sec"],["Sit-to-stand","3 × 10","60–90 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 15","60 sec"],["Gentle mobility routine","10 min","—"]]],
+["Thursday 24 Sep","Mobility / recovery",[["Easy walk","10–20 min easy","—"],["Mobility routine","10–12 min","—"]]],
+["Friday 25 Sep","Session 2 — Friday",[["Warm-up walk","5–8 min easy","—"],["Wall sit","4 × 30–40 sec","90 sec"],["Bodyweight squat to chair","3 × 10","90 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 20","60 sec"],["Gentle mobility routine","10 min","—"]]],
+["Saturday 26 Sep","Mobility / recovery",[["Easy walk","15–20 min easy","—"],["Mobility routine","10–12 min","—"]]],["Sunday 27 Sep","Rest",[]]]},
+
 1:{goal:"Settle & activate",days:[
 ["Monday","Strength A",[["Wall sit","4 × 30 sec","90 sec"],["Straight-leg raise","3 × 12","60 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 15","60 sec"],["Side-lying leg raise","3 × 12/side","45 sec"]]],
-["Tuesday","Recovery",[["Easy walk","10–20 min","—"],["Optional gentle mobility","Optional","—"]]],
+["Tuesday","Recovery",[["Easy walk","10–20 min","—"],["Mobility routine","10–12 min","—"]]],
 ["Wednesday","Strength B",[["Wall sit","4 × 30 sec","90 sec"],["Sit-to-stand","3 × 10","60–90 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 15","60 sec"],["Dead bug","3 × 8/side","45 sec"]]],
-["Thursday","Recovery",[["Easy walk","10–20 min","—"],["Optional gentle mobility","Optional","—"]]],
+["Thursday","Recovery",[["Easy walk","10–20 min","—"],["Mobility routine","10–12 min","—"]]],
 ["Friday","Strength A",[["Wall sit","4 × 30 sec","90 sec"],["Straight-leg raise","3 × 12","60 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 15","60 sec"],["Side-lying leg raise","3 × 12/side","45 sec"]]],
-["Saturday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],["Sunday","Rest",[]]]},
+["Saturday","Recovery",[["Easy walk","Easy","—"],["Mobility routine","10–12 min","—"]]],["Sunday","Rest",[]]]},
 2:{goal:"Increase load",days:[
 ["Monday","Strength A",[["Wall sit","4 × 40 sec","90 sec"],["Straight-leg raise","3 × 15","60 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 20","60 sec"],["Side-lying leg raise","3 × 15/side","45 sec"]]],
-["Tuesday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],
+["Tuesday","Recovery",[["Easy walk","Easy","—"],["Mobility routine","10–12 min","—"]]],
 ["Wednesday","Strength B",[["Wall sit","4 × 40 sec","90 sec"],["Bodyweight squat to chair","3 × 10–12","90 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 20","60 sec"],["Dead bug","3 × 10/side","45 sec"]]],
-["Thursday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],
+["Thursday","Recovery",[["Easy walk","Easy","—"],["Mobility routine","10–12 min","—"]]],
 ["Friday","Strength A",[["Wall sit","4 × 40 sec","90 sec"],["Straight-leg raise","3 × 15","60 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 20","60 sec"],["Side-lying leg raise","3 × 15/side","45 sec"]]],
-["Saturday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],["Sunday","Rest",[]]]},
+["Saturday","Recovery",[["Easy walk","Easy","—"],["Mobility routine","10–12 min","—"]]],["Sunday","Rest",[]]]},
 3:{goal:"Build strength",days:[
 ["Monday","Strength A",[["Slow bodyweight squat","3 × 10","90 sec"],["Reverse lunge","3 × 8/leg","90 sec"],["Single-leg glute bridge","3 × 10/leg","60 sec"],["Single-leg calf raise","3 × 12/leg","60 sec"],["Side-lying leg raise","3 × 15","45 sec"]]],
-["Tuesday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],
+["Tuesday","Recovery",[["Easy walk","Easy","—"],["Mobility routine","10–12 min","—"]]],
 ["Wednesday","Strength B",[["Wall sit","4 × 45–60 sec","90 sec"],["Step-up","3 × 8/leg","90 sec"],["Slow squat","3 × 10","90 sec"],["Single-leg calf raise","3 × 12–15","60 sec"],["Dead bug","3 × 10/side","45 sec"]]],
-["Thursday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],
+["Thursday","Recovery",[["Easy walk","Easy","—"],["Mobility routine","10–12 min","—"]]],
 ["Friday","Strength A",[["Slow bodyweight squat","3 × 10","90 sec"],["Reverse lunge","3 × 8/leg","90 sec"],["Single-leg glute bridge","3 × 10/leg","60 sec"],["Single-leg calf raise","3 × 12/leg","60 sec"],["Side-lying leg raise","3 × 15","45 sec"]]],
-["Saturday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],["Sunday","Rest",[]]]},
+["Saturday","Recovery",[["Easy walk","Easy","—"],["Mobility routine","10–12 min","—"]]],["Sunday","Rest",[]]]},
 4:{goal:"Build capacity",days:[
 ["Monday","Strength A",[["Squat","3 × 12","90 sec"],["Reverse lunge","3 × 10/leg","90 sec"],["Step-up","3 × 10/leg","90 sec"],["Single-leg glute bridge","3 × 12/leg","60 sec"],["Single-leg calf raise","3 × 15","60 sec"]]],
-["Tuesday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],
+["Tuesday","Recovery",[["Easy walk","Easy","—"],["Mobility routine","10–12 min","—"]]],
 ["Wednesday","Strength B",[["Wall sit","4 × 60 sec","90 sec"],["Slow squat","3 × 10","90 sec"],["Reverse lunge","3 × 8/leg","90 sec"],["Step-up","3 × 10/leg","90 sec"],["Single-leg calf raise","3 × 15","60 sec"]]],
-["Thursday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],
+["Thursday","Recovery",[["Easy walk","Easy","—"],["Mobility routine","10–12 min","—"]]],
 ["Friday","Strength A",[["Squat","3 × 12","90 sec"],["Reverse lunge","3 × 10/leg","90 sec"],["Step-up","3 × 10/leg","90 sec"],["Single-leg glute bridge","3 × 12/leg","60 sec"],["Single-leg calf raise","3 × 15","60 sec"]]],
 ["Saturday","Week 4 test",[["Single-leg squat","10 right-leg reps","—"],["Step-ups","15 right-leg reps","—"],["Single-leg calf raises","20 right-leg reps","—"],["Wall sit","60 sec","—"]]],["Sunday","Rest",[]]]},
 5:{goal:"Bridge to running",days:[
 ["Monday","Progress testing — after 4 weeks",[["Resting pain check","Record 0–10","—"],["Single-leg squat","15 controlled right-leg reps","—"],["Step-ups","20 controlled right-leg reps","—"],["Single-leg calf raise","25 controlled reps","—"],["Wall sit","60 sec","—"],["Two-leg pogo hops","3 × 20","90 sec"],["Single-leg balance","30 sec right + 30 sec left","—"]]],
-["Tuesday","Recovery",[["Easy walk","Easy","—"],["Recovery","—","—"]]],
+["Tuesday","Recovery",[["Easy walk","Easy","—"],["Mobility routine","10–12 min","—"]]],
 ["Wednesday","Strength + landing",[["Wall sit","3 × 60 sec","90 sec"],["Slow squat","3 × 10","90 sec"],["Reverse lunge","3 × 8/leg","90 sec"],["Single-leg calf raise","3 × 15","60 sec"],["Snap-down → controlled landing","3 × 5","60–90 sec"]]],
-["Thursday","Recovery",[["Easy walk","Easy","—"],["Recovery","—","—"]]],
+["Thursday","Recovery",[["Easy walk","Easy","—"],["Mobility routine","10–12 min","—"]]],
 ["Friday","Strength + pogos",[["Squat","3 × 12","90 sec"],["Step-up","3 × 10/leg","90 sec"],["Reverse lunge","3 × 10/leg","90 sec"],["Single-leg calf raise","3 × 15","60 sec"],["Pogo hops","3 × 20","90 sec"]]],
 ["Saturday","Week 5 test",[["Single-leg squat","15 right-leg reps","—"],["Single-leg calf raise","20–25 reps","—"],["Step-ups","20 right-leg reps","—"],["Single-leg balance","30 sec","—"],["Pogo hops","3 × 20","—"]]],["Sunday","Rest",[]]]},
 6:{goal:"Gym foundation — heavy slow strength",gym:true,days:[
@@ -79,7 +85,7 @@ const weeks={
 ["Wednesday","Gym B",[["Bike warm-up","8–10 min easy","—"],["Hack squat or goblet squat","3 × 8–10 @ RPE 6","2 min"],["Leg press","3 × 10 @ RPE 6–7","2 min"],["Step-up","3 × 8/leg @ RPE 6","90 sec"],["Leg extension","3 × 10 @ RPE 6–7","90 sec"],["Seated calf raise","3 × 15","60–90 sec"],["Hip abduction","2 × 15","60 sec"]]],
 ["Thursday","Recovery",[["Easy walk or bike","15–25 min easy","—"],["Mobility","Optional","—"]]],
 ["Friday","Gym A",[["Bike warm-up","8–10 min easy","—"],["Leg press","3 × 10 @ RPE 7","2 min"],["Leg extension","3 × 12 @ RPE 7","90 sec"],["Reverse lunge","3 × 8/leg @ RPE 6","2 min"],["Romanian deadlift","3 × 8–10 @ RPE 7","90 sec"],["Standing calf raise","3 × 12–15","60–90 sec"],["Seated hamstring curl","3 × 12","90 sec"]]],
-["Saturday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],["Sunday","Rest",[]]]}
+["Saturday","Recovery",[["Easy walk","Easy","—"],["Mobility routine","10–12 min","—"]]],["Sunday","Rest",[]]]}
 };
 
 const bridge={
@@ -88,16 +94,22 @@ const bridge={
 };
 
 const running=[
-["Stage 1","Run/walk re-entry","1 min easy jog + 2 min walk × 6 (18 min total)","Only after physio agrees and strength/hop criteria are met."],
-["Stage 2","Run/walk progression","2 min easy jog + 1 min walk × 6 (18 min total)","No meaningful next-morning increase before progressing."],
-["Stage 3","Longer easy running","3 min easy jog + 1 min walk × 6 (24 min total)","Keep pace conversational; no hills."],
-["Stage 4","Continuous easy run","15–20 min easy continuous run","Build duration before speed."],
-["Stage 5","Easy run capacity","25–30 min easy run","Progress volume gradually; keep sprinting out for now."],
-["Stage 6","Acceleration","6 × 10 m at ~60%, then 4 × 15 m at ~70%","Sprinting should be pain-free and symptom response stable."],
-["Stage 7","Speed exposure","6 × 20 m at ~75–80% + 4 × 30 m at ~80%","Full walk-back recovery; stop if mechanics change."],
-["Stage 8","Change of direction","4 × each: 45° cuts, then 90° cuts at controlled speed","Add intensity only after easy running and acceleration are tolerated."],
-["Stage 9","Rugby conditioning","Straight-line running → tempo intervals → shuttle work → ball skills","Introduce rugby demands one layer at a time."],
-["Stage 10","Return to training","Modified team training → fuller training → contact → match minutes","Return-to-sport decisions should be shared with your physio/club staff."]
+["Week 5 — Stage 1","Run/walk re-entry","Warm-up: 5 min brisk walk + leg swings, ankle rocks, marching and 2 × 20 m relaxed build-ups. Main: 1 min easy jog + 2 min walk × 6. Cool-down: 5–10 min easy walk.","Only after your physio clears running following Week 5 testing."],
+["Week 5 — Stage 1B","Repeat run/walk","Warm-up: 5–8 min brisk walk + dynamic mobility. Main: repeat 1 min jog + 2 min walk × 6. Cool-down 5–10 min.","Repeat this stage rather than progressing if evening or next-morning symptoms increase."],
+["Week 6 — Stage 2","Longer run/walk","Warm-up: 8 min walk/jog + A-march + calf raises + 3 progressive strides at 50–60%. Main: 2 min easy jog + 1 min walk × 6. Cool-down 5–10 min.","Build duration before speed. No sprinting yet."],
+["Week 6 — Stage 2B","Run/walk volume","Warm-up: 8–10 min easy + dynamic drills. Main: 3 min jog + 1 min walk × 5–6. Cool-down 5–10 min.","Only progress if the previous exposure is stable the next morning."],
+["Week 7 — Stage 3","Continuous easy running","Warm-up: 8–10 min walk/jog + A-march/ankling + 3 × 20 m progressive strides. Main: 15–20 min easy continuous run. Cool-down 5–10 min.","Flat route and conversational pace."],
+["Week 7 — Stage 3B","Easy run capacity","Warm-up 8–10 min. Main: 20–25 min easy run. Cool-down 5–10 min.","Increase duration before hills or speed."],
+["Week 8 — Stage 4","Acceleration introduction","Warm-up: 10 min easy jog/walk + leg swings + A-march/A-skip + 3 × 20 m progressive strides at 50–60%. Main: 20–25 min easy run + 4 × 10 m accelerations at ~60%, full walk-back.","First sprint exposure is deliberately submaximal."],
+["Week 8 — Stage 4B","Acceleration progression","Warm-up 10–12 min + 3 progressive strides. Main: 5 × 15 m at ~65–70%, full walk-back; then 15–20 min easy running.","Stop if pain changes your stride or builds rep-to-rep."],
+["Week 9 — Stage 5","Speed exposure","Warm-up: 10–12 min easy + dynamic drills + 3 × 20 m progressive strides. Main: 6 × 20 m at ~75–80%, full walk-back; then 15–20 min easy running.","Do not chase maximal speed; quality and mechanics come first."],
+["Week 9 — Stage 5B","Sprint repeat exposure","Warm-up 10–12 min. Main: 4 × 20 m at ~75–80% + 4 × 30 m at ~80%, 2–3 min recovery between sets. Finish with 10–15 min easy running.","Keep high-speed volume modest and avoid back-to-back sprint days."],
+["Week 10 — Stage 6","Acceleration + deceleration","Warm-up: 12 min + A-march/A-skip + leg swings + 3 × 20 m build-ups. Main: 6 × 20 m accelerations at ~80%, then 4 controlled decelerations from a 15 m build-up.","Add braking before hard change of direction."],
+["Week 10 — Stage 6B","Change of direction introduction","Warm-up 12–15 min + progressive runs. Main: 4 × 45° cuts each side at controlled speed, then 4 × 10 m accelerations. Finish with easy aerobic running.","Controlled direction changes before sharper rugby movement."],
+["Week 11 — Stage 7","COD + rugby conditioning","Warm-up: 12–15 min dynamic + progressive strides. Main: 4 × 20 m accelerations, 4 × 45° cuts, 4 × 90° cuts at controlled speed, then 6 × 30 sec run / 30 sec walk.","Introduce rugby-style movement without maximal fatigue."],
+["Week 11 — Stage 7B","Higher-speed conditioning","Warm-up 15 min. Main: 6 × 20 m at ~80–85%, 4 × 30 m at ~80%, then 6–8 controlled shuttle reps.","Only progress speed and conditioning together if symptoms stay stable."],
+["Week 12 — Stage 8","Rugby-specific return","Warm-up: 15 min dynamic + 3–4 progressive runs. Main: straight-line running → tempo intervals → shuttle/COD → ball skills → 4 × 20 m controlled accelerations.","Begin with modified rugby exposure."],
+["Week 12 — Stage 8B","Modified training → fuller training","Warm-up 15–20 min. Main: modified team session; if tolerated, progress toward fuller training, contact and later match minutes.","Full return should be agreed with your physio and club staff."]
 ];
 
 const rugbyTests=[
@@ -111,10 +123,19 @@ const rugbyTests=[
 ["Training tolerance","Full modified session","Symptoms return to baseline by next morning"]
 ];
 
+const mobilityRoutine=[
+["Ankle knee-to-wall","2 × 10/side","Heel stays down; controlled range"],
+["Standing quad / hip-flexor stretch","2 × 30 sec/side","Gentle, no forcing the knee"],
+["Calf stretch","2 × 30 sec/side","Straight-knee then bent-knee"],
+["Adductor rock-back","2 × 8/side","Easy range"],
+["90/90 hip rotations","2 × 6/side","Slow and controlled"],
+["Glute bridge","2 × 10","Easy activation"]
+];
+
 const key="patellarRehabV1";
 let state=JSON.parse(localStorage.getItem(key)||"{}");
 let page=localStorage.getItem("rehabPage")||"dashboard";
-let currentWeek=Number(localStorage.getItem("rehabWeek")||1);
+let currentWeek=localStorage.getItem("rehabWeek")||"0.5";
 let timerInterval=null,timerSeconds=90,weekTimerInterval=null,weekTimerSeconds=90;
 
 function save(){localStorage.setItem(key,JSON.stringify(state))}
@@ -174,28 +195,39 @@ function renderStart(){
  <section class="card"><h3>Rest timer</h3><div class="timer" id="timer">1:30</div><div class="timerBtns"><button class="smallbtn" onclick="startTimer(60)">60 sec</button><button class="smallbtn" onclick="startTimer(90)">90 sec</button><button class="smallbtn" onclick="startTimer(120)">2 min</button><button class="smallbtn" onclick="stopTimer()">Stop</button></div></section>`;
  return body;
 }
-function weekDate(w){let d=new Date(homeStart+"T00:00:00");d.setDate(d.getDate()+(w-1)*7);return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})}
+function weekDate(w){
+ if(String(w)==="0.5") return "23–27 Sep";
+ let d=new Date(homeStart+"T00:00:00");d.setDate(d.getDate()+(Number(w)-1)*7);
+ return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})
+}
 function renderWeek(){
- const w=weeks[currentWeek];let body=`<section class="card"><h2>Weeks 1–6</h2><div class="weekTabs">${[1,2,3,4,5,6].map(n=>`<button class="${currentWeek===n?'active':''}" onclick="currentWeek=${n};localStorage.setItem('rehabWeek',${n});render()">Week ${n}</button>`).join('')}</div></section>`;
- body+=`<section class="card"><div class="row"><div style="flex:1"><h2>Week ${currentWeek} — ${w.goal}</h2><div class="muted">Starts ${weekDate(currentWeek)}</div></div><span class="tag">${w.gym?"GYM":"HOME"}</span></div>`;
- if(currentWeek<5)body+=`<div class="notice">No running in weeks 1–4, following your physio's advice.</div>`;
- if(currentWeek===5)body+=`<div class="notice"><b>Monday is your progress-testing session.</b> It comes after four weeks of rehab so you can compare your strength, control, pain and hopping tolerance. Do not add running just because the tests look better — review them with your physio first.</div>`;
- if(currentWeek===6)body+=`<div class="notice"><b>Gym Week 6:</b> this is a strength-building block, not a licence to run. Start conservatively, record the actual weights and aim around RPE 6–7. If the knee is more painful the next morning, reduce the next session's load/volume.</div>`;
+ const w=weeks[currentWeek];
+ let body=`<section class="card"><h2>Weeks 1–6</h2><p class="muted" style="margin-top:-4px">Extra Week 0.5 bridge session is shown first.</p><div class="weekTabs">${["0.5",1,2,3,4,5,6].map(n=>`<button class="${String(currentWeek)===String(n)?"active":""}" onclick="currentWeek='${n}';localStorage.setItem('rehabWeek','${n}');render()">Week ${n}</button>`).join("")}</div></section>`;
+ body+=`<section class="card"><div class="row"><div style="flex:1"><h2>Week ${currentWeek} — ${w.goal}</h2><div class="muted">Starts ${weekDate(currentWeek)}</div></div><span class="tag">${currentWeek==="0.5"?"BRIDGE":(w.gym?"GYM":"HOME")}</span></div>`;
+ if(currentWeek==="0.5") body+=`<div class="notice"><b>Bridge week:</b> complete the Wednesday 23 September and Friday 25 September sessions here before Week 1 starts Monday 28 September. Keep these sessions low-impact.</div>`;
+ if(currentWeek<5 && currentWeek!=="0.5")body+=`<div class="notice">No running in weeks 1–4, following your physio's advice.</div>`;
+ if(currentWeek===5)body+=`<div class="notice"><b>Monday is your progress-testing session.</b> Running starts here only if your physio clears it after the testing and symptom response review.</div>`;
+ if(currentWeek===6)body+=`<div class="notice"><b>Gym Week 6:</b> strength-building continues. Running is a separate, graded exposure and should only be done if Week 5 was tolerated and your physio is happy.</div>`;
  body+=`<div class="weekTimer"><h3>Rest timer</h3><div class="timer" id="weekTimer">1:30</div><div class="timerBtns"><button class="smallbtn" onclick="startWeekTimer(60)">60 sec</button><button class="smallbtn" onclick="startWeekTimer(90)">90 sec</button><button class="smallbtn" onclick="startWeekTimer(120)">2 min</button><button class="smallbtn" onclick="stopWeekTimer()">Stop</button></div></div></section>`;
  w.days.forEach((d,i)=>{
    const k=dayKey("w"+currentWeek,i);
    if(!d[2].length)body+=`<section class="card"><h2>${d[0]}</h2><div class="muted">${d[1]}</div><p class="muted">Rest day.</p></section>`;
    else body+=sessionCard(k,d[0],d[1],d[2]);
  });
+ body+=`<section class="card"><h3>Mobility routine</h3><p class="muted">Use on recovery days. Keep every movement comfortable; do not stretch into knee pain.</p>${mobilityRoutine.map(m=>`<div class="exercise"><div class="row"><div class="ename">${m[0]}</div></div><div class="dose">${m[1]} • ${m[2]}</div></div>`).join("")}</section>`;
  if(currentWeek===4)body+=`<section class="card"><h3>Week 4 checkpoint</h3><p class="muted">Aim for controlled single-leg work without obvious favouring and no significant next-morning flare.</p></section>`;
- if(currentWeek===5)body+=`<section class="card warning"><h3>Week 5 checkpoint</h3><p class="muted">Before running, review resting pain, strength tolerance, hopping tolerance and next-morning response with your physio.</p></section>`;
- if(currentWeek===6)body+=`<section class="card"><h3>Gym progression rule</h3><p class="muted">If all sets are controlled and symptoms remain stable, add a small amount of weight next time (for example 2.5–5%) rather than adding lots of extra volume. If symptoms flare, hold or reduce the load.</p></section>`;
+ if(currentWeek===5)body+=`<section class="card warning"><h3>Week 5 checkpoint</h3><p class="muted">Review resting pain, strength tolerance, hopping tolerance and next-morning response with your physio before progressing into running.</p></section>`;
+ if(currentWeek===6)body+=`<section class="card"><h3>Gym progression rule</h3><p class="muted">If all sets are controlled and symptoms remain stable, add a small amount of weight next time (for example 2.5–5%) rather than lots of extra volume. If symptoms flare, hold or reduce the load.</p></section>`;
  body+=`<section class="card"><div class="row"><button class="smallbtn" onclick="changeWeek(-1)">← Previous</button><button class="smallbtn" onclick="changeWeek(1)">Next →</button></div></section>`;
  return body;
 }
-function changeWeek(n){currentWeek=Math.max(1,Math.min(6,currentWeek+n));localStorage.setItem("rehabWeek",currentWeek);render()}
+function changeWeek(n){
+ const order=["0.5",1,2,3,4,5,6],idx=order.indexOf(String(currentWeek));
+ currentWeek=order[Math.max(0,Math.min(order.length-1,idx+n))];
+ localStorage.setItem("rehabWeek",currentWeek);render()
+}
 function renderRunning(){
- let body=`<section class="card"><h2>Return to running → rugby</h2><div class="warning notice"><b>Do not treat these stages as automatic clearance.</b><br>Your physio's advice comes first. The sequence is deliberately gradual: running → acceleration → speed → change of direction → rugby conditioning → team training.</div>
+ let body=`<section class="card"><h2>Running</h2><p class="muted" style="margin-top:-4px">Return-to-running plan starts at Week 5 and progresses through Week 12.</p><div class="warning notice"><b>Do not treat these stages as automatic clearance.</b><br>Your physio's advice comes first. The sequence is deliberately gradual: running → acceleration → speed → change of direction → rugby conditioning → team training.</div>
 <p class="muted">Progress one stage at a time. If symptoms are clearly worse the next morning, repeat the previous stage or reduce the load. Sprinting should be pain-free before you make it a regular training exposure.</p></section>`;
  running.forEach((r,i)=>{const k="run"+i,x=state[k]||{};body+=`<section class="card"><div class="row"><div style="flex:1"><h3>${r[0]} — ${r[1]}</h3><div class="muted">${r[2]}</div></div><input type="checkbox" ${x.done?'checked':''} onchange="setv('${k}','done',this.checked);render()"></div><p class="muted">${r[3]}</p><details><summary style="font-weight:700">Log response</summary>${metrics(k)}</details></section>`});
  return body;
@@ -210,21 +242,21 @@ function renderDashboard(){
  const overall=totalProgress();
  const today=new Date();
  const dow=today.toLocaleDateString('en-GB',{weekday:'long'});
- const weekToday=Math.min(6,Math.max(1,Math.floor((today-new Date(homeStart+'T00:00:00'))/86400000/7)+1));
+ const diffDays=Math.floor((today-new Date("2026-09-23T00:00:00"))/86400000); const weekToday=diffDays<5?"0.5":Math.min(6,Math.max(1,Math.floor((today-new Date(homeStart+"T00:00:00"))/86400000/7)+1));
  const wp=weekProgress(weekToday);
  return `<section class="card"><h2>Dashboard</h2><div class="grid2">
  <div class="stat"><small>Exercises checked</small><br><b>${overall.done}</b><br><small>of ${overall.total}</small></div>
  <div class="stat"><small>Running stages</small><br><b>${runDone}</b><br><small>of ${running.length}</small></div>
  </div></section>
  <section class="card"><h3>This week</h3><div class="grid2"><div class="stat"><small>Week</small><br><b>${weekToday}</b><br><small>${weeks[weekToday].goal}</small></div><div class="stat"><small>Exercises</small><br><b>${wp.done}/${wp.total}</b><br><small>completed</small></div></div><div class="progressrow"><span>${dow}</span><span>${Math.round((wp.total?wp.done/wp.total:0)*100)}%</span></div><div class="bar"><i style="width:${wp.total?wp.done/wp.total*100:0}%"></i></div><button class="primary" style="margin-top:10px" onclick="currentWeek=${weekToday};localStorage.setItem('rehabWeek',${weekToday});setPage('week')">Open this week's plan</button></section>
- <section class="card"><h3>6-week completion</h3>${[1,2,3,4,5,6].map(w=>{const p=weekProgress(w);return `<div class="progressrow"><span>Week ${w}</span><span>${p.done}/${p.total}</span></div><div class="bar"><i style="width:${p.total?p.done/p.total*100:0}%"></i></div>`}).join("")}</section>
+ <section class="card"><h3>Weeks 1–6 completion</h3>${["0.5",1,2,3,4,5,6].map(w=>{const p=weekProgress(w);return `<div class="progressrow"><span>Week ${w}</span><span>${p.done}/${p.total}</span></div><div class="bar"><i style="width:${p.total?p.done/p.total*100:0}%"></i></div>`}).join("")}</section>
  <section class="card"><h3>Pain trend</h3><p class="muted">Logged session pain before vs next morning. Empty charts simply mean you haven't logged enough sessions yet.</p><canvas id="painChart" width="700" height="190"></canvas></section>
  <section class="card"><h3>Load / RPE trend</h3><p class="muted">Session RPE from your logged rehab sessions.</p><canvas id="rpeChart" width="700" height="190"></canvas></section>
- <section class="card"><h3>Two sessions before Monday</h3><p class="muted">Your bridge sessions are ready for Thu 24 Sept and Sat 26 Sept.</p></section>${Object.entries(bridge).map(([title,items],i)=>sessionCard("bridge"+i,title,"Complete once before Monday.",items)).join("")}
+ <section class="card"><h3>Week 0.5 — bridge sessions</h3><p class="muted">Today: Wednesday 23 September. Second session: Friday 25 September. Week 1 starts Monday 28 September.</p><button class="primary" onclick="currentWeek='0.5';localStorage.setItem('rehabWeek','0.5');setPage('week')">Open Week 0.5</button></section>
  <section class="card"><h3>Quick guidance</h3><p class="muted">Use the next-morning response as one of your main load checks. A graded, criterion-based return to sport is preferable to a sudden jump from rehab to full training.</p></section>`;
 }
 function weekProgress(w){let done=0,total=0;weeks[w].days.forEach((d,i)=>{if(!d[2].length)return;const x=state[dayKey("w"+w,i)]||{};d[2].forEach((_,j)=>{total++;if(x["e"+j])done++})});return{done,total}}
-function totalProgress(){let done=0,total=0;for(let w=1;w<=6;w++){const p=weekProgress(w);done+=p.done;total+=p.total}return{done,total}}
+function totalProgress(){let done=0,total=0;for(const w of ["0.5",1,2,3,4,5,6]){const p=weekProgress(w);done+=p.done;total+=p.total}return{done,total}}
 function drawDashboardIfNeeded(){if(page==="dashboard"){setTimeout(drawCharts,20)}}
 function chart(canvasId,values1,values2,label1,label2){
  const c=document.getElementById(canvasId);if(!c)return;const ctx=c.getContext("2d"),W=c.width,H=c.height;
