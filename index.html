@@ -94,22 +94,22 @@ const bridge={
 };
 
 const running=[
-["Week 5 — Stage 1","Run/walk re-entry","Warm-up: 5 min brisk walk + leg swings, ankle rocks, marching and 2 × 20 m relaxed build-ups. Main: 1 min easy jog + 2 min walk × 6. Cool-down: 5–10 min easy walk.","Only after your physio clears running following Week 5 testing."],
-["Week 5 — Stage 1B","Repeat run/walk","Warm-up: 5–8 min brisk walk + dynamic mobility. Main: repeat 1 min jog + 2 min walk × 6. Cool-down 5–10 min.","Repeat this stage rather than progressing if evening or next-morning symptoms increase."],
-["Week 6 — Stage 2","Longer run/walk","Warm-up: 8 min walk/jog + A-march + calf raises + 3 progressive strides at 50–60%. Main: 2 min easy jog + 1 min walk × 6. Cool-down 5–10 min.","Build duration before speed. No sprinting yet."],
-["Week 6 — Stage 2B","Run/walk volume","Warm-up: 8–10 min easy + dynamic drills. Main: 3 min jog + 1 min walk × 5–6. Cool-down 5–10 min.","Only progress if the previous exposure is stable the next morning."],
-["Week 7 — Stage 3","Continuous easy running","Warm-up: 8–10 min walk/jog + A-march/ankling + 3 × 20 m progressive strides. Main: 15–20 min easy continuous run. Cool-down 5–10 min.","Flat route and conversational pace."],
-["Week 7 — Stage 3B","Easy run capacity","Warm-up 8–10 min. Main: 20–25 min easy run. Cool-down 5–10 min.","Increase duration before hills or speed."],
-["Week 8 — Stage 4","Acceleration introduction","Warm-up: 10 min easy jog/walk + leg swings + A-march/A-skip + 3 × 20 m progressive strides at 50–60%. Main: 20–25 min easy run + 4 × 10 m accelerations at ~60%, full walk-back.","First sprint exposure is deliberately submaximal."],
-["Week 8 — Stage 4B","Acceleration progression","Warm-up 10–12 min + 3 progressive strides. Main: 5 × 15 m at ~65–70%, full walk-back; then 15–20 min easy running.","Stop if pain changes your stride or builds rep-to-rep."],
-["Week 9 — Stage 5","Speed exposure","Warm-up: 10–12 min easy + dynamic drills + 3 × 20 m progressive strides. Main: 6 × 20 m at ~75–80%, full walk-back; then 15–20 min easy running.","Do not chase maximal speed; quality and mechanics come first."],
-["Week 9 — Stage 5B","Sprint repeat exposure","Warm-up 10–12 min. Main: 4 × 20 m at ~75–80% + 4 × 30 m at ~80%, 2–3 min recovery between sets. Finish with 10–15 min easy running.","Keep high-speed volume modest and avoid back-to-back sprint days."],
-["Week 10 — Stage 6","Acceleration + deceleration","Warm-up: 12 min + A-march/A-skip + leg swings + 3 × 20 m build-ups. Main: 6 × 20 m accelerations at ~80%, then 4 controlled decelerations from a 15 m build-up.","Add braking before hard change of direction."],
-["Week 10 — Stage 6B","Change of direction introduction","Warm-up 12–15 min + progressive runs. Main: 4 × 45° cuts each side at controlled speed, then 4 × 10 m accelerations. Finish with easy aerobic running.","Controlled direction changes before sharper rugby movement."],
-["Week 11 — Stage 7","COD + rugby conditioning","Warm-up: 12–15 min dynamic + progressive strides. Main: 4 × 20 m accelerations, 4 × 45° cuts, 4 × 90° cuts at controlled speed, then 6 × 30 sec run / 30 sec walk.","Introduce rugby-style movement without maximal fatigue."],
-["Week 11 — Stage 7B","Higher-speed conditioning","Warm-up 15 min. Main: 6 × 20 m at ~80–85%, 4 × 30 m at ~80%, then 6–8 controlled shuttle reps.","Only progress speed and conditioning together if symptoms stay stable."],
-["Week 12 — Stage 8","Rugby-specific return","Warm-up: 15 min dynamic + 3–4 progressive runs. Main: straight-line running → tempo intervals → shuttle/COD → ball skills → 4 × 20 m controlled accelerations.","Begin with modified rugby exposure."],
-["Week 12 — Stage 8B","Modified training → fuller training","Warm-up 15–20 min. Main: modified team session; if tolerated, progress toward fuller training, contact and later match minutes.","Full return should be agreed with your physio and club staff."]
+{week:5,day:"Monday",stage:"Stage 1",title:"Run/walk re-entry",session:"Warm-up: 5 min brisk walk + leg swings, ankle rocks, marching and 2 × 20 m relaxed build-ups. Main: 1 min easy jog + 2 min walk × 6. Cool-down: 5–10 min easy walk.",note:"Only after your physio clears running following Week 5 testing."},
+{week:5,day:"Friday",stage:"Stage 1B",title:"Repeat run/walk",session:"Warm-up: 5–8 min brisk walk + dynamic mobility. Main: repeat 1 min jog + 2 min walk × 6. Cool-down: 5–10 min easy walk.",note:"Repeat this stage rather than progressing if evening or next-morning symptoms increase."},
+{week:6,day:"Monday",stage:"Stage 2",title:"Longer run/walk",session:"Warm-up: 8 min walk/jog + A-march + calf raises + 3 progressive strides at 50–60%. Main: 2 min easy jog + 1 min walk × 6. Cool-down: 5–10 min easy walk.",note:"Build duration before speed. No sprinting yet."},
+{week:6,day:"Friday",stage:"Stage 2B",title:"Run/walk volume",session:"Warm-up: 8–10 min easy + dynamic drills. Main: 3 min jog + 1 min walk × 5–6. Cool-down: 5–10 min easy walk.",note:"Only progress if the previous exposure is stable the next morning."},
+{week:7,day:"Monday",stage:"Stage 3",title:"Continuous easy running",session:"Warm-up: 8–10 min walk/jog + A-march/ankling + 3 × 20 m progressive strides. Main: 15–20 min easy continuous run. Cool-down: 5–10 min easy walk.",note:"Flat route and conversational pace."},
+{week:7,day:"Friday",stage:"Stage 3B",title:"Easy run capacity",session:"Warm-up: 8–10 min easy walk/jog + dynamic mobility + 3 progressive strides. Main: 20–25 min easy run. Cool-down: 5–10 min easy walk.",note:"Increase duration before hills or speed."},
+{week:8,day:"Monday",stage:"Stage 4",title:"Acceleration introduction",session:"Warm-up: 10 min easy jog/walk + leg swings + A-march/A-skip + 3 × 20 m progressive strides at 50–60%. Main: 20–25 min easy run + 4 × 10 m accelerations at ~60%, full walk-back recovery. Cool-down: 5–10 min walk.",note:"First sprint exposure is deliberately submaximal."},
+{week:8,day:"Friday",stage:"Stage 4B",title:"Acceleration progression",session:"Warm-up: 10–12 min + dynamic drills + 3 progressive strides. Main: 5 × 15 m at ~65–70%, full walk-back; then 15–20 min easy running. Cool-down: 5–10 min walk.",note:"Stop if pain changes your stride or builds rep-to-rep."},
+{week:9,day:"Monday",stage:"Stage 5",title:"Speed exposure",session:"Warm-up: 10–12 min easy + dynamic drills + 3 × 20 m progressive strides. Main: 6 × 20 m at ~75–80%, full walk-back; then 15–20 min easy running. Cool-down: 5–10 min walk.",note:"Do not chase maximal speed; quality and mechanics come first."},
+{week:9,day:"Friday",stage:"Stage 5B",title:"Sprint repeat exposure",session:"Warm-up: 10–12 min + dynamic drills + 3 progressive strides. Main: 4 × 20 m at ~75–80% + 4 × 30 m at ~80%, 2–3 min recovery between sets. Finish with 10–15 min easy running. Cool-down: 5–10 min walk.",note:"Keep high-speed volume modest and avoid back-to-back sprint days."},
+{week:10,day:"Monday",stage:"Stage 6",title:"Acceleration + deceleration",session:"Warm-up: 12 min + A-march/A-skip + leg swings + 3 × 20 m build-ups. Main: 6 × 20 m accelerations at ~80%, then 4 controlled decelerations from a 15 m build-up. Cool-down: 5–10 min walk/jog.",note:"Add braking before hard change of direction."},
+{week:10,day:"Friday",stage:"Stage 6B",title:"Change of direction introduction",session:"Warm-up: 12–15 min + progressive runs. Main: 4 × 45° cuts each side at controlled speed, then 4 × 10 m accelerations. Finish with easy aerobic running. Cool-down: 5–10 min walk.",note:"Controlled direction changes before sharper rugby movement."},
+{week:11,day:"Monday",stage:"Stage 7",title:"COD + rugby conditioning",session:"Warm-up: 12–15 min dynamic + progressive strides. Main: 4 × 20 m accelerations, 4 × 45° cuts, 4 × 90° cuts at controlled speed, then 6 × 30 sec run / 30 sec walk. Cool-down: 5–10 min easy walk.",note:"Introduce rugby-style movement without maximal fatigue."},
+{week:11,day:"Friday",stage:"Stage 7B",title:"Higher-speed conditioning",session:"Warm-up: 15 min including dynamic mobility + progressive runs. Main: 6 × 20 m at ~80–85%, 4 × 30 m at ~80%, then 6–8 controlled shuttle reps. Cool-down: 5–10 min easy walk.",note:"Only progress speed and conditioning together if symptoms stay stable."},
+{week:12,day:"Monday",stage:"Stage 8",title:"Rugby-specific return",session:"Warm-up: 15 min dynamic + 3–4 progressive runs. Main: straight-line running → tempo intervals → shuttle/COD → ball skills → 4 × 20 m controlled accelerations. Cool-down: 5–10 min easy walk.",note:"Begin with modified rugby exposure."},
+{week:12,day:"Friday",stage:"Stage 8B",title:"Modified training → fuller training",session:"Warm-up: 15–20 min dynamic + progressive running. Main: modified team session; if tolerated, progress toward fuller training, contact and later match minutes. Cool-down: 5–10 min easy walk.",note:"Full return should be agreed with your physio and club staff."}
 ];
 
 const rugbyTests=[
@@ -227,11 +227,21 @@ function changeWeek(n){
  localStorage.setItem("rehabWeek",currentWeek);render()
 }
 function renderRunning(){
- let body=`<section class="card"><h2>Running</h2><p class="muted" style="margin-top:-4px">Return-to-running plan starts at Week 5 and progresses through Week 12.</p><div class="warning notice"><b>Do not treat these stages as automatic clearance.</b><br>Your physio's advice comes first. The sequence is deliberately gradual: running → acceleration → speed → change of direction → rugby conditioning → team training.</div>
-<p class="muted">Progress one stage at a time. If symptoms are clearly worse the next morning, repeat the previous stage or reduce the load. Sprinting should be pain-free before you make it a regular training exposure.</p></section>`;
- running.forEach((r,i)=>{const k="run"+i,x=state[k]||{};body+=`<section class="card"><div class="row"><div style="flex:1"><h3>${r[0]} — ${r[1]}</h3><div class="muted">${r[2]}</div></div><input type="checkbox" ${x.done?'checked':''} onchange="setv('${k}','done',this.checked);render()"></div><p class="muted">${r[3]}</p><details><summary style="font-weight:700">Log response</summary>${metrics(k)}</details></section>`});
+ let weekList=[5,6,7,8,9,10,11,12];
+ let rw=Number(state.runningWeek||5);
+ if(!weekList.includes(rw))rw=5;
+ let body=`<section class="card"><h2>Running</h2><p class="muted" style="margin-top:-4px">Running starts from Week 5. Each week is laid out like the Weeks 1–6 section, with Monday and Friday sessions.</p><div class="warning notice"><b>Do not treat these stages as automatic clearance.</b><br>Your physio's advice comes first. Progress gradually: running → acceleration → speed → change of direction → rugby conditioning → team training.</div>
+ <div class="weekTabs" id="runWeekTabs">${weekList.map(w=>`<button class="${w===rw?'active':''}" onclick="setRunningWeek(${w})">Week ${w}</button>`).join('')}</div></section>`;
+ let items=running.filter(r=>r.week===rw);
+ body+=`<section class="card"><h2>Week ${rw}</h2><p class="muted">Complete the sessions in order and use the response log after each exposure.</p>`;
+ items.forEach((r,i)=>{let globalIndex=running.indexOf(r);const k="run"+globalIndex,x=state[k]||{};body+=`<div class="exercise"><div class="row"><span class="tag">${r.day}</span><div style="flex:1"><h3>${r.stage} — ${r.title}</h3></div><input type="checkbox" ${x.done?'checked':''} onchange="setv('${k}','done',this.checked);render()"></div><p class="muted" style="margin:10px 0 5px"><b>Session:</b> ${r.session}</p><p class="muted"><b>Progression note:</b> ${r.note}</p><details><summary style="font-weight:700">Log response</summary>${metrics(k)}</details></div>`});
+ body+=`</section>`;
+ let done=items.filter((r)=>state["run"+running.indexOf(r)]?.done).length;
+ body+=`<section class="card"><h3>Week ${rw} progress</h3><div class="progressrow"><span>${done} of ${items.length} sessions completed</span><b>${Math.round(done/items.length*100)}%</b></div><div class="bar"><i style="width:${Math.round(done/items.length*100)}%"></i></div></section>`;
+ body+=`<section class="card"><h3>Running progression</h3><ol class="checklist"><li>Weeks 5–6: run/walk re-entry and build duration</li><li>Week 7: continuous easy running</li><li>Weeks 8–9: acceleration and controlled speed exposure</li><li>Weeks 10–11: deceleration, change of direction and conditioning</li><li>Week 12: modified rugby-specific running and return toward team training</li></ol></section>`;
  return body;
 }
+function setRunningWeek(w){state.runningWeek=w;save();render();}
 function renderDashboard(){
  let sessions=0,checked=0,total=0;let painData=[];
  for(let w=1;w<=6;w++){let wt=weeks[w];let wd=0,wtot=0;
