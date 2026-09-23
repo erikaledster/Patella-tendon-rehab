@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Patellar Rehab</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#111827;--muted:#667085;--line:#e5e7eb;--accent:#2563eb;--good:#15803d;--warn:#b45309;--bad:#b91c1c}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;padding-bottom:90px}
+header{background:#111827;color:white;padding:18px 18px 20px;position:sticky;top:0;z-index:5} header h1{margin:0;font-size:22px} header p{margin:5px 0 0;color:#cbd5e1;font-size:13px}
+nav{display:flex;gap:7px;overflow:auto;padding:10px 12px;background:white;border-bottom:1px solid var(--line);position:sticky;top:73px;z-index:4}
+nav button{border:0;background:#eef2f7;border-radius:10px;padding:9px 13px;font-weight:700;white-space:nowrap;color:#374151}nav button.active{background:var(--accent);color:#fff}
+main{max-width:720px;margin:auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 1px 2px #00000008}
+h2{font-size:19px;margin:3px 0 12px}h3{font-size:15px;margin:0 0 9px}.muted{color:var(--muted);font-size:13px}
+.exercise{border-top:1px solid var(--line);padding:13px 0}.exercise:first-of-type{border-top:0}
+.row{display:flex;align-items:center;gap:10px}.row input[type=checkbox]{width:22px;height:22px;accent-color:var(--accent)}.ename{font-weight:700;flex:1}.dose{font-size:13px;color:var(--muted);margin-top:4px;margin-left:32px}
+.inputs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0 0 32px}.inputs label,.metric label{font-size:11px;color:var(--muted);display:block}.inputs input,.metric input,.notes{width:100%;margin-top:3px;border:1px solid #d1d5db;border-radius:9px;padding:9px;background:#fff;font-size:16px}
+button.primary{width:100%;border:0;border-radius:11px;padding:12px;background:var(--accent);color:white;font-weight:800;font-size:15px}.smallbtn{border:1px solid var(--line);background:white;border-radius:9px;padding:8px 10px;font-weight:700}
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.metric{background:#f8fafc;border-radius:11px;padding:9px}.metric input{margin-top:5px}
+.bar{height:10px;background:#e5e7eb;border-radius:10px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--accent);width:0}
+.notice{padding:12px;border-radius:12px;background:#eff6ff;color:#1e40af;font-size:13px;margin-bottom:12px}.warning{background:#fff7ed;color:#9a3412}
+.footer{font-size:11px;color:var(--muted);text-align:center;padding:15px}
+.hidden{display:none}.tag{display:inline-block;padding:4px 7px;border-radius:8px;background:#eef2ff;color:#3730a3;font-size:11px;font-weight:700}
+@media(min-width:600px){.metrics{grid-template-columns:repeat(5,1fr)}.inputs{grid-template-columns:repeat(5,1fr)}}
+</style>
+</head>
+<body>
+<header><h1>Right Patellar Tendon Rehab</h1><p>5-week home programme • tap the checkbox when complete</p></header>
+<nav id="weekNav"></nav>
+<main id="app"></main>
+<div class="footer">This tracker supports the programme provided to you. Follow your physio's advice, especially about running.</div>
+<script>
+const weeks = {
+1:{
+goal:"Settle & activate",
+days:[
+["Monday","Strength A",[["Wall sit","4 × 30 sec","90 sec"],["Straight-leg raise","3 × 12","60 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 15","60 sec"],["Side-lying leg raise","3 × 12/side","45 sec"]]],
+["Tuesday","Recovery",[["Easy walk","10–20 min","—"],["Optional gentle mobility","Optional","—"]]],
+["Wednesday","Strength B",[["Wall sit","4 × 30 sec","90 sec"],["Sit-to-stand","3 × 10","60–90 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 15","60 sec"],["Dead bug","3 × 8/side","45 sec"]]],
+["Thursday","Recovery",[["Easy walk","10–20 min","—"],["Optional gentle mobility","Optional","—"]]],
+["Friday","Strength A",[["Wall sit","4 × 30 sec","90 sec"],["Straight-leg raise","3 × 12","60 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 15","60 sec"],["Side-lying leg raise","3 × 12/side","45 sec"]]],
+["Saturday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],["Sunday","Rest",[]]]},
+2:{goal:"Increase load",days:[
+["Monday","Strength A",[["Wall sit","4 × 40 sec","90 sec"],["Straight-leg raise","3 × 15","60 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 20","60 sec"],["Side-lying leg raise","3 × 15/side","45 sec"]]],
+["Tuesday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],
+["Wednesday","Strength B",[["Wall sit","4 × 40 sec","90 sec"],["Bodyweight squat to chair","3 × 10–12","90 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 20","60 sec"],["Dead bug","3 × 10/side","45 sec"]]],
+["Thursday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],
+["Friday","Strength A",[["Wall sit","4 × 40 sec","90 sec"],["Straight-leg raise","3 × 15","60 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 20","60 sec"],["Side-lying leg raise","3 × 15/side","45 sec"]]],
+["Saturday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],["Sunday","Rest",[]]]},
+3:{goal:"Build strength",days:[
+["Monday","Strength A",[["Slow bodyweight squat","3 × 10","90 sec"],["Reverse lunge","3 × 8/leg","90 sec"],["Single-leg glute bridge","3 × 10/leg","60 sec"],["Single-leg calf raise","3 × 12/leg","60 sec"],["Side-lying leg raise","3 × 15","45 sec"]]],
+["Tuesday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],
+["Wednesday","Strength B",[["Wall sit","4 × 45–60 sec","90 sec"],["Step-up","3 × 8/leg","90 sec"],["Slow squat","3 × 10","90 sec"],["Single-leg calf raise","3 × 12–15","60 sec"],["Dead bug","3 × 10/side","45 sec"]]],
+["Thursday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],
+["Friday","Strength A",[["Slow bodyweight squat","3 × 10","90 sec"],["Reverse lunge","3 × 8/leg","90 sec"],["Single-leg glute bridge","3 × 10/leg","60 sec"],["Single-leg calf raise","3 × 12/leg","60 sec"],["Side-lying leg raise","3 × 15","45 sec"]]],
+["Saturday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],["Sunday","Rest",[]]]},
+4:{goal:"Build capacity",days:[
+["Monday","Strength A",[["Squat","3 × 12","90 sec"],["Reverse lunge","3 × 10/leg","90 sec"],["Step-up","3 × 10/leg","90 sec"],["Single-leg glute bridge","3 × 12/leg","60 sec"],["Single-leg calf raise","3 × 15","60 sec"]]],
+["Tuesday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],
+["Wednesday","Strength B",[["Wall sit","4 × 60 sec","90 sec"],["Slow squat","3 × 10","90 sec"],["Reverse lunge","3 × 8/leg","90 sec"],["Step-up","3 × 10/leg","90 sec"],["Single-leg calf raise","3 × 15","60 sec"]]],
+["Thursday","Recovery",[["Easy walk","Easy","—"],["Optional mobility","Optional","—"]]],
+["Friday","Strength A",[["Squat","3 × 12","90 sec"],["Reverse lunge","3 × 10/leg","90 sec"],["Step-up","3 × 10/leg","90 sec"],["Single-leg glute bridge","3 × 12/leg","60 sec"],["Single-leg calf raise","3 × 15","60 sec"]]],
+["Saturday","Week 4 test",[["Single-leg squat","10 right-leg reps","—"],["Step-ups","15 right-leg reps","—"],["Single-leg calf raises","20 right-leg reps","—"],["Wall sit","60 sec","—"]]],["Sunday","Rest",[]]]},
+5:{goal:"Bridge to running",days:[
+["Monday","Strength + pogos",[["Squat","3 × 10","90 sec"],["Reverse lunge","3 × 10/leg","90 sec"],["Step-up","3 × 10/leg","90 sec"],["Single-leg calf raise","3 × 15","60 sec"],["Two-leg pogo hops","3 × 15","90 sec"]]],
+["Tuesday","Recovery",[["Easy walk","Easy","—"],["Recovery","—","—"]]],
+["Wednesday","Strength + landing",[["Wall sit","3 × 60 sec","90 sec"],["Slow squat","3 × 10","90 sec"],["Reverse lunge","3 × 8/leg","90 sec"],["Single-leg calf raise","3 × 15","60 sec"],["Snap-down → controlled landing","3 × 5","60–90 sec"]]],
+["Thursday","Recovery",[["Easy walk","Easy","—"],["Recovery","—","—"]]],
+["Friday","Strength + pogos",[["Squat","3 × 12","90 sec"],["Step-up","3 × 10/leg","90 sec"],["Reverse lunge","3 × 10/leg","90 sec"],["Single-leg calf raise","3 × 15","60 sec"],["Pogo hops","3 × 20","90 sec"]]],
+["Saturday","Week 5 test",[["Single-leg squat","15 right-leg reps","—"],["Single-leg calf raise","20–25 reps","—"],["Step-ups","20 right-leg reps","—"],["Single-leg balance","30 sec","—"],["Pogo hops","3 × 20","—"]]],["Sunday","Rest",[]]]}
+};
+let currentWeek=1;
+const key="patellarRehabV1";
+let state=JSON.parse(localStorage.getItem(key)||"{}");
+function save(){localStorage.setItem(key,JSON.stringify(state))}
+function dayKey(w,d){return `w${w}-${d}`}
+function renderNav(){document.getElementById("weekNav").innerHTML=Object.keys(weeks).map(w=>`<button class="${+w===currentWeek?'active':''}" onclick="currentWeek=${w};render()"}>Week ${w}</button>`).join("")}
+function metrics(k){
+ const x=state[k]||{};
+ return `<div class="metrics">
+ <div class="metric"><label>Pain before /10</label><input inputmode="decimal" value="${x.pb??''}" onchange="setv('${k}','pb',this.value)"></div>
+ <div class="metric"><label>Pain during /10</label><input inputmode="decimal" value="${x.pd??''}" onchange="setv('${k}','pd',this.value)"></div>
+ <div class="metric"><label>RPE /10</label><input inputmode="decimal" value="${x.rpe??''}" onchange="setv('${k}','rpe',this.value)"></div>
+ <div class="metric"><label>Pain after /10</label><input inputmode="decimal" value="${x.pa??''}" onchange="setv('${k}','pa',this.value)"></div>
+ <div class="metric"><label>Next morning /10</label><input inputmode="decimal" value="${x.nm??''}" onchange="setv('${k}','nm',this.value)"></div>
+ </div><textarea class="notes" rows="2" placeholder="Notes..." onchange="setv('${k}','notes',this.value)">${x.notes??''}</textarea>`;
+}
+function setv(k,p,v){state[k]=state[k]||{};state[k][p]=v;save()}
+function render(){
+ renderNav();
+ const w=weeks[currentWeek];
+ let done=0,total=0;
+ let body=`<div class="notice"><b>Week ${currentWeek}: ${w.goal}</b><br>${currentWeek<5?'No running during weeks 1–4, following your physio’s advice.':'Only progress toward running if your physio is happy with it.'}</div>`;
+ w.days.forEach((d,i)=>{
+   const k=dayKey(currentWeek,i), x=state[k]||{};
+   body+=`<section class="card"><div class="row"><div style="flex:1"><h2>${d[0]}</h2><div class="muted">${d[1]}</div></div>${d[2].length?'<span class="tag">SESSION</span>':''}</div>`;
+   if(!d[2].length){body+=`<p class="muted">${d[1]==='Rest'?'Full rest.':'Keep it easy and comfortable.'}</p></section>`;return}
+   d[2].forEach((e,j)=>{total++;let ck=!!x['e'+j];if(ck)done++;body+=`<div class="exercise"><div class="row"><input type="checkbox" ${ck?'checked':''} onchange="toggle('${k}',${j},this.checked)"><div class="ename">${e[0]}</div></div><div class="dose">${e[1]} • Rest ${e[2]}</div></div>`});
+   body+=`<details><summary style="font-weight:700;margin:12px 0">Log session</summary>${metrics(k)}</details></section>`;
+ });
+ body=`<div class="card"><div class="row"><div style="flex:1"><b>Week progress</b><div class="muted">${done}/${total} exercises completed</div></div><button class="smallbtn" onclick="resetWeek()">Reset week</button></div><div class="bar" style="margin-top:10px"><i style="width:${total?done/total*100:0}%"></i></div></div>`+body;
+ if(currentWeek===4) body+=`<section class="card"><h3>Week 4 checkpoint</h3><p class="muted">The next morning is important: you want to be around your normal baseline rather than significantly more sore or stiff.</p></section>`;
+ if(currentWeek===5) body+=`<section class="card warning"><h3>Week 5 checkpoint</h3><p class="muted">Record resting pain, strength pain, hopping pain, RPE and next-morning pain. Use these as a discussion point with your physio before running.</p></section>`;
+ document.getElementById("app").innerHTML=body;
+}
+function toggle(k,j,v){state[k]=state[k]||{};state[k]['e'+j]=v;save();render()}
+function resetWeek(){if(confirm('Reset all checkboxes and logs for this week?')){Object.keys(state).filter(k=>k.startsWith('w'+currentWeek+'-')).forEach(k=>delete state[k]);save();render()}}
+render();
+</script><script>if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{})}</script>
+</body>
+</html>
