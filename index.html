@@ -327,7 +327,7 @@ function renderWeek(){
  if(currentWeek===4 && String(d[0]).startsWith("Saturday")) body+=`<section class="card"><h3>Week 4 checkpoint</h3><p class="muted">Complete the Saturday test as prescribed, then use the mobility routine if symptoms are settled.</p></section>`;
  if(currentWeek===5 && dayIndex===0)body+=`<section class="card warning"><h3>Week 5 testing</h3><p class="muted">Review resting pain, strength tolerance, hopping tolerance and next-morning response with your physio before progressing into running.</p></section>`;
  if(currentWeek===6)body+=`<section class="card"><h3>Gym progression rule</h3><p class="muted">If all sets are controlled and symptoms remain stable, add a small amount of weight next time (for example 2.5–5%) rather than lots of extra volume. If symptoms flare, hold or reduce the load.</p></section>`;
- body+=renderWeekAnalysis(currentWeek);
+ if(String(activeDay[0]).split(" ")[0] === "Sunday") body+=renderWeekAnalysis(currentWeek);
  body+=`<section class="card"><div class="row"><button class="smallbtn" onclick="changeDay(-1)">← Previous day</button><button class="smallbtn" onclick="changeDay(1)">Next day →</button></div></section>`; return body;
 }
 function changeDay(n){ const max=(weeks[currentWeek]?.days?.length||1)-1; currentDay=Math.max(0,Math.min(max,currentDay+n)); localStorage.setItem("rehabDay",currentDay); render(); }
