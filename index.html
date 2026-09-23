@@ -138,6 +138,7 @@ const key="patellarRehabV1";
 let state=JSON.parse(localStorage.getItem(key)||"{}");
 let page=localStorage.getItem("rehabPage")||"dashboard";
 let currentWeek=localStorage.getItem("rehabWeek")||"0.5";
+let currentDay=Number(localStorage.getItem("rehabDay")||0);
 let timerInterval=null,timerSeconds=90,weekTimerInterval=null,weekTimerSeconds=90;
 
 function save(){localStorage.setItem(key,JSON.stringify(state))}
@@ -145,7 +146,24 @@ function setPage(p){page=p;localStorage.setItem("rehabPage",p);render()}
 function dayKey(prefix,id){return prefix+"-"+id}
 function setv(k,p,v){state[k]=state[k]||{};state[k][p]=v;save();drawDashboardIfNeeded()}
 function toggle(k,j,v){state[k]=state[k]||{};state[k]["e"+j]=v;save();render()}
-function isChecked(k,j){return !!(state[k]||{})["e"+j]}
+function setCountFromDose(dose){
+ const m=String(dose||"").match(/^(\d+)\s*[x×]/i);
+ return m ? Number(m[1]) : 1;
+}
+function getSetChecks(k,j,count){
+ const x=state[k]||{};
+ if(Array.isArray(x.sets?.[j])) { const a=x.sets[j].slice(0,count); while(a.length<count)a.push(false); return a; }
+ return Array.from({length:count},()=>!!x["e"+j]);
+}
+function toggleSet(k,j,setIndex,v){
+ state[k]=state[k]||{}; state[k].sets=state[k].sets||{};
+ const arr=getSetChecks(k,j,Math.max(setIndex+1,1)); arr[setIndex]=v;
+ state[k].sets[j]=arr; state[k]["e"+j]=arr.every(Boolean); save(); render();
+}
+function setExercisePain(k,j,v){
+ state[k]=state[k]||{}; state[k].exercisePain=state[k].exercisePain||{}; state[k].exercisePain[j]=v; save();
+}
+function isExerciseComplete(k,j,dose){return getSetChecks(k,j,setCountFromDose(dose)).every(Boolean)}
 function allSessionKeys(){return Object.keys(state).filter(k=>state[k]&&typeof state[k]==="object")}
 function painAdvice(x){
  const vals=[x.pb,x.pd,x.pa,x.nm].map(Number).filter(v=>!Number.isNaN(v));
@@ -166,13 +184,25 @@ function metrics(k){
  ${slider('Next morning /10','nm',x.nm)}
  </div><textarea class="notes" rows="2" placeholder="Notes: load used, knee response, confidence, anything unusual..." onchange="setv('${k}','notes',this.value)">${x.notes??''}</textarea>`;
 }
-function sessionCard(k,title,subtitle,items){
+function sessionCard(k,title,subtitle,items,opts={}){
  const x=state[k]||{};let done=0;
  let body=`<section class="card"><div class="row"><div style="flex:1"><h2>${title}</h2><div class="muted">${subtitle||""}</div></div><span class="tag">SESSION</span></div>`;
- items.forEach((e,j)=>{if(isChecked(k,j))done++;body+=`<div class="exercise"><div class="row"><input type="checkbox" ${isChecked(k,j)?'checked':''} onchange="toggle('${k}',${j},this.checked)"><div class="ename">${e[0]}</div></div><div class="dose">${e[1]} • Rest ${e[2]}</div></div>`});
- body+=`<div class="progressrow"><span>${done}/${items.length} completed</span><span>${items.length?Math.round(done/items.length*100):0}%</span></div><div class="bar"><i style="width:${items.length?done/items.length*100:0}%"></i></div>`;
- body+=`<details><summary style="font-weight:700;margin:12px 0">Log session</summary>${metrics(k)}</details>`;
- body+=`</section>`;return body;
+ items.forEach((e,j)=>{
+   const count=setCountFromDose(e[1]), checks=getSetChecks(k,j,count), complete=checks.every(Boolean); if(complete)done++;
+   body+=`<div class="exercise"><div class="row"><div class="ename">${e[0]}</div>${complete?'<span class="pill">COMPLETE</span>':''}</div>`;
+   const targetRpe=(String(e[1]).match(/RPE\s*([0-9]+(?:\.[0-9]+)?)/i)||[])[1];
+   body+=`<div class="dose">${e[1]} • <b>Rest:</b> ${e[2]}${targetRpe?` • <b>Target RPE:</b> ${targetRpe}`:''}</div>`;
+   const exercisePain=((x.exercisePain||{})[j] ?? 0);
+   body+=`<div class="metric sliderMetric" style="margin:10px 0 0 0;background:#f8fafc"><div class="sliderHead"><label><b>Pain during exercise</b></label><b id="${k}-ep${j}-out">${exercisePain}/10</b></div><input type="range" min="0" max="10" step="0.5" value="${exercisePain}" oninput="setExercisePain('${k}',${j},this.value);document.getElementById('${k}-ep${j}-out').textContent=this.value+'/10'"></div>`;
+   body+=`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">`;
+   for(let si=0;si<count;si++){
+     const repText=String(e[1]).replace(/^\d+\s*[x×]\s*/i,'').trim();
+     body+=`<label style="display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:${checks[si]?'#f8e8f0':'#fff'};font-size:13px"><input type="checkbox" ${checks[si]?'checked':''} onchange="toggleSet('${k}',${j},${si},this.checked)" style="width:21px;height:21px;accent-color:var(--accent)"><span>Set ${si+1} <b>${repText}</b></span></label>`;
+   }
+   body+=`</div></div>`;
+ });
+ body+=`<div class="progressrow"><span>${done}/${items.length} exercises completed</span><span>${items.length?Math.round(done/items.length*100):0}%</span></div><div class="bar"><i style="width:${items.length?done/items.length*100:0}%"></i></div>`;
+ body+=`<details><summary style="font-weight:700;margin:12px 0">Log session</summary>${metrics(k)}</details></section>`; return body;
 }
 function renderNav(){
  const tabs=[["dashboard","Dashboard"],["week","Weeks 1–6"],["running","Running"],["tests","Tests"]];
@@ -203,36 +233,30 @@ function weekDate(w){
  return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})
 }
 function renderWeek(){
- const w=weeks[currentWeek];
- let body=`<section class="card"><h2>Weeks 1–6</h2><p class="muted" style="margin-top:-4px">Extra Week 0.5 bridge session is shown first.</p><div class="weekTabs">${["0.5",1,2,3,4,5,6].map(n=>`<button class="${String(currentWeek)===String(n)?"active":""}" onclick="currentWeek='${n}';localStorage.setItem('rehabWeek','${n}');render()">Week ${n}</button>`).join("")}</div></section>`;
+ const w=weeks[currentWeek], dayIndex=Math.max(0,Math.min((w?.days?.length||1)-1,currentDay)); currentDay=dayIndex;
+ const activeDay=w.days[dayIndex];
+ let body=`<section class="card"><h2>Weeks 1–6</h2><p class="muted" style="margin-top:-4px">Week 0.5 is the bridge before Week 1.</p><div class="weekTabs">${["0.5",1,2,3,4,5,6].map(n=>`<button class="${String(currentWeek)===String(n)?"active":""}" onclick="currentWeek='${n}';currentDay=0;localStorage.setItem('rehabWeek','${n}');localStorage.setItem('rehabDay','0');render()">Week ${n}</button>`).join("")}</div></section>`;
  body+=`<section class="card"><div class="row"><div style="flex:1"><h2>Week ${currentWeek} — ${w.goal}</h2><div class="muted">Starts ${weekDate(currentWeek)}</div></div><span class="tag">${currentWeek==="0.5"?"BRIDGE":(w.gym?"GYM":"HOME")}</span></div>`;
- if(currentWeek==="0.5") body+=`<div class="notice"><b>Bridge week:</b> complete the Wednesday 23 September and Friday 25 September sessions here before Week 1 starts Monday 28 September. Keep these sessions low-impact.</div>`;
- if(currentWeek<5 && currentWeek!=="0.5")body+=`<div class="notice">No running in weeks 1–4, following your physio's advice.</div>`;
+ if(currentWeek==="0.5") body+=`<div class="notice"><b>Bridge week:</b> complete the Wednesday 23 September and Friday 25 September sessions before Week 1 starts Monday 28 September.</div>`;
+ if(currentWeek<5 && currentWeek!=="0.5")body+=`<div class="notice">No running in Weeks 1–4, following your physio's advice.</div>`;
  if(currentWeek===5)body+=`<div class="notice"><b>Monday is your progress-testing session.</b> Running starts here only if your physio clears it after the testing and symptom response review.</div>`;
- if(currentWeek===6)body+=`<div class="notice"><b>Gym Week 6:</b> strength-building continues. Running is a separate, graded exposure and should only be done if Week 5 was tolerated and your physio is happy.</div>`;
+ if(currentWeek===6)body+=`<div class="notice"><b>Gym Week 6:</b> strength-building continues. Running is a separate graded exposure and should only be done if Week 5 was tolerated and your physio is happy.</div>`;
  body+=`<div class="weekTimer"><h3>Rest timer</h3><div class="timer" id="weekTimer">1:30</div><div class="timerBtns"><button class="smallbtn" onclick="startWeekTimer(60)">60 sec</button><button class="smallbtn" onclick="startWeekTimer(90)">90 sec</button><button class="smallbtn" onclick="startWeekTimer(120)">2 min</button><button class="smallbtn" onclick="stopWeekTimer()">Stop</button></div></div></section>`;
- w.days.forEach((d,i)=>{
-   const k=dayKey("w"+currentWeek,i);
-   if(!d[2].length) body+=`<section class="card"><h2>${d[0]}</h2><div class="muted">${d[1]}</div><p class="muted">Rest day.</p></section>`;
-   else if(["Tuesday","Thursday","Saturday"].includes(String(d[0]).split(" ")[0]) && /recovery|mobility/i.test(d[1])) {
-     const walk=d[2].find(x=>/walk|bike/i.test(x[0]));
-     const items=[];
-     if(walk) items.push(walk);
-     mobilityRoutine.forEach(m=>items.push(m));
-     body+=sessionCard(k,d[0],"Mobility / recovery — complete this routine on Tuesday, Thursday and Saturday.",items);
-   } else body+=sessionCard(k,d[0],d[1],d[2]);
-   if(String(d[0]).startsWith("Saturday") && currentWeek===4) body+=`<section class="card"><h3>Post-test mobility</h3><p class="muted">After the Week 4 checkpoint, complete the mobility routine if symptoms are settled.</p>${mobilityRoutine.map(m=>`<div class="exercise"><div class="row"><div class="ename">${m[0]}</div></div><div class="dose">${m[1]} • ${m[2]}</div></div>`).join("")}</section>`;
- });
- if(currentWeek===4)body+=`<section class="card"><h3>Week 4 checkpoint</h3><p class="muted">Aim for controlled single-leg work without obvious favouring and no significant next-morning flare.</p></section>`;
- if(currentWeek===5)body+=`<section class="card warning"><h3>Week 5 checkpoint</h3><p class="muted">Review resting pain, strength tolerance, hopping tolerance and next-morning response with your physio before progressing into running.</p></section>`;
+ body+=`<section class="card"><h3>Days</h3><div class="weekTabs">${w.days.map((d,i)=>`<button class="${i===dayIndex?'active':''}" onclick="currentDay=${i};localStorage.setItem('rehabDay','${i}');render()">${String(d[0]).split(' ')[0]}</button>`).join("")}</div></section>`;
+ const d=activeDay,k=dayKey("w"+currentWeek,dayIndex);
+ if(!d[2].length) body+=`<section class="card"><h2>${d[0]}</h2><div class="muted">${d[1]}</div><p class="muted">Rest day.</p></section>`;
+ else if(["Tuesday","Thursday","Saturday"].includes(String(d[0]).split(" ")[0]) && /recovery|mobility/i.test(d[1])) { const walk=d[2].find(x=>/walk|bike/i.test(x[0])),items=[]; if(walk)items.push(walk); mobilityRoutine.forEach(m=>items.push(m)); body+=sessionCard(k,d[0],"Mobility / recovery — complete this routine on Tuesday, Thursday and Saturday.",items,{setTracking:true}); }
+ else body+=sessionCard(k,d[0],d[1],d[2],{setTracking:true});
+ if(currentWeek===4 && String(d[0]).startsWith("Saturday")) body+=`<section class="card"><h3>Week 4 checkpoint</h3><p class="muted">Complete the Saturday test as prescribed, then use the mobility routine if symptoms are settled.</p></section>`;
+ if(currentWeek===5 && dayIndex===0)body+=`<section class="card warning"><h3>Week 5 testing</h3><p class="muted">Review resting pain, strength tolerance, hopping tolerance and next-morning response with your physio before progressing into running.</p></section>`;
  if(currentWeek===6)body+=`<section class="card"><h3>Gym progression rule</h3><p class="muted">If all sets are controlled and symptoms remain stable, add a small amount of weight next time (for example 2.5–5%) rather than lots of extra volume. If symptoms flare, hold or reduce the load.</p></section>`;
- body+=`<section class="card"><div class="row"><button class="smallbtn" onclick="changeWeek(-1)">← Previous</button><button class="smallbtn" onclick="changeWeek(1)">Next →</button></div></section>`;
- return body;
+ body+=`<section class="card"><div class="row"><button class="smallbtn" onclick="changeDay(-1)">← Previous day</button><button class="smallbtn" onclick="changeDay(1)">Next day →</button></div></section>`; return body;
 }
+function changeDay(n){ const max=(weeks[currentWeek]?.days?.length||1)-1; currentDay=Math.max(0,Math.min(max,currentDay+n)); localStorage.setItem("rehabDay",currentDay); render(); }
 function changeWeek(n){
  const order=["0.5",1,2,3,4,5,6],idx=order.indexOf(String(currentWeek));
- currentWeek=order[Math.max(0,Math.min(order.length-1,idx+n))];
- localStorage.setItem("rehabWeek",currentWeek);render()
+ currentWeek=order[Math.max(0,Math.min(order.length-1,idx+n))]; currentDay=0;
+ localStorage.setItem("rehabWeek",currentWeek); localStorage.setItem("rehabDay","0"); render()
 }
 function renderRunning(){
  let weekList=[5,6,7,8,9,10,11,12];
@@ -289,7 +313,7 @@ function renderDashboard(){
  <section class="card"><h3>Week 0.5 — bridge sessions</h3><p class="muted">Today: Wednesday 23 September. Second session: Friday 25 September. Week 1 starts Monday 28 September.</p><button class="primary" onclick="currentWeek='0.5';localStorage.setItem('rehabWeek','0.5');setPage('week')">Open Week 0.5</button></section>
  <section class="card"><h3>Quick guidance</h3><p class="muted">Use the next-morning response as one of your main load checks. A graded, criterion-based return to sport is preferable to a sudden jump from rehab to full training.</p></section>`;
 }
-function weekProgress(w){let done=0,total=0;weeks[w].days.forEach((d,i)=>{if(!d[2].length)return;const x=state[dayKey("w"+w,i)]||{};d[2].forEach((_,j)=>{total++;if(x["e"+j])done++})});return{done,total}}
+function weekProgress(w){let done=0,total=0;weeks[w].days.forEach((d,i)=>{if(!d[2].length)return;d[2].forEach((e,j)=>{total++;if(isExerciseComplete(dayKey("w"+w,i),j,e[1]))done++})});return{done,total}}
 function totalProgress(){let done=0,total=0;for(const w of ["0.5",1,2,3,4,5,6]){const p=weekProgress(w);done+=p.done;total+=p.total}return{done,total}}
 function drawDashboardIfNeeded(){if(page==="dashboard"){setTimeout(drawCharts,20)}}
 function chart(canvasId,values1,values2,label1,label2){
