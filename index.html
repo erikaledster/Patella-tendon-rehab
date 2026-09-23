@@ -194,6 +194,19 @@ function toggleSet(k,j,setIndex,v){
 function setExercisePain(k,j,v){
  state[k]=state[k]||{}; state[k].exercisePain=state[k].exercisePain||{}; state[k].exercisePain[j]=v; save();
 }
+function setExerciseWeight(k,j,v){
+ state[k]=state[k]||{};state[k].weights=state[k].weights||{};state[k].weights[j]=v;
+ const num=Number(v);
+ const items=weeks[currentWeek]?.days?.[currentDay]?.[2]||[];
+ const name=items[j]?.[0];
+ if(name && Number.isFinite(num) && num>0){
+   state.prs=state.prs||{};
+   const old=Number(state.prs[name]?.weight||0);
+   if(num>old){ state.prs[name]={weight:num,date:new Date().toISOString().slice(0,10)}; }
+ }
+ save(); render();
+}
+function setPR(name,v){ state.prs=state.prs||{};state.prs[name]=state.prs[name]||{};state.prs[name].weight=v;state.prs[name].date=new Date().toISOString().slice(0,10);save();render(); }
 function isExerciseComplete(k,j,dose){return getSetChecks(k,j,setCountFromDose(dose)).every(Boolean)}
 function allSessionKeys(){return Object.keys(state).filter(k=>state[k]&&typeof state[k]==="object")}
 function painAdvice(x){
@@ -223,6 +236,8 @@ function sessionCard(k,title,subtitle,items,opts={}){
    body+=`<div class="exercise"><div class="row"><div class="ename">${e[0]}</div>${complete?'<span class="pill">COMPLETE</span>':''}</div>`;
    const targetRpe=(String(e[1]).match(/RPE\s*([0-9]+(?:\.[0-9]+)?)/i)||[])[1];
    body+=`<div class="dose">${e[1]} • <b>Rest:</b> ${e[2]}${targetRpe?` • <b>Target RPE:</b> ${targetRpe}`:''}</div>`;
+   const showWeight = currentWeek===6 && !/easy walk|mobility routine|warm-up walk|rest/i.test(e[0]);
+   if(showWeight){ const wt=((x.weights||{})[j]??''); body+=`<div class="metric" style="margin:10px 0 0 0;background:#f8fafc"><label><b>Weight used (kg)</b></label><input inputmode="decimal" type="number" min="0" step="0.5" placeholder="e.g. 20" value="${wt}" onchange="setExerciseWeight('${k}',${j},this.value)"></div>`;}
    const exercisePain=((x.exercisePain||{})[j] ?? 0);
    const noPainSlider=/^(incline push-up|push-up or incline push-up|band row|bird dog|dead bug|pallof press|side plank|db bench press|seated cable row|lat pulldown|db shoulder press)$/i.test(e[0].trim());
    if(!noPainSlider) body+=`<div class="metric sliderMetric" style="margin:10px 0 0 0;background:#f8fafc"><div class="sliderHead"><label><b>Pain during exercise</b></label><b id="${k}-ep${j}-out">${exercisePain}/10</b></div><input type="range" min="0" max="10" step="0.5" value="${exercisePain}" oninput="setExercisePain('${k}',${j},this.value);document.getElementById('${k}-ep${j}-out').textContent=this.value+'/10'"></div>`;
@@ -237,7 +252,7 @@ function sessionCard(k,title,subtitle,items,opts={}){
  body+=`<details><summary style="font-weight:700;margin:12px 0">Log session</summary>${metrics(k)}</details></section>`; return body;
 }
 function renderNav(){
- const tabs=[["dashboard","Dashboard"],["week","Weeks 1–6"],["running","Running"],["tests","Tests"]];
+ const tabs=[["dashboard","Dashboard"],["week","Weeks 1–6"],["running","Running"],["prs","PR Weights"],["tests","Tests"]];
  document.getElementById("nav").innerHTML=tabs.map(([p,n])=>`<button class="${page===p?'active':''}" onclick="setPage('${p}')">${n}</button>`).join("");
 }
 function render(){
@@ -246,6 +261,7 @@ function render(){
  if(page==="start") body=renderStart();
  if(page==="week") body=renderWeek();
  if(page==="running") body=renderRunning();
+ if(page==="prs") body=renderPRs();
  if(page==="dashboard") body=renderDashboard();
  if(page==="tests") body=renderTests();
  document.getElementById("app").innerHTML=body;
@@ -283,10 +299,13 @@ function weekReport(w){
  const avg=a=>a.length?(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1):'—';
  return {exercises,complete,pct:exercises?Math.round(complete/exercises*100):0,avgPain:avg(painVals),avgRpe:avg(rpeVals),avgNext:avg(nextVals),sessionCount,daysLogged};
 }
+function weekWeightEntries(w){ const wk=weeks[w]; if(!wk)return 0; let n=0; wk.days.forEach((d,i)=>{const x=state[dayKey('w'+w,i)]||{}; n+=Object.values(x.weights||{}).filter(v=>v!==''&&v!=null&&!Number.isNaN(Number(v))).length;}); return n; }
+function getProgramExercises(){ const skip=/easy walk|mobility routine|warm-up walk|rest|gentle mobility|bike warm-up|cool-down/i; const seen=new Set(),out=[]; Object.keys(weeks).forEach(w=>weeks[w].days.forEach(d=>d[2].forEach(e=>{if(!skip.test(e[0])&&!seen.has(e[0])){seen.add(e[0]);out.push(e[0]);}}))); return out; }
+function renderPRs(){ const exercises=getProgramExercises(),prs=state.prs||{}; let body=`<section class="card"><h2>PR Weights</h2><p class="muted">PRs update automatically when you log a new weight in your gym sessions. If the new weight is higher than your current PR, the PR and date are updated. Lower weights do not overwrite your PR.</p></section>`; body+=`<section class="card"><div class="grid2">${exercises.map(name=>{const x=prs[name]||{};return `<div class="metric"><label><b>${name}</b></label><input type="number" min="0" step="0.5" placeholder="kg" value="${x.weight??''}" onchange="setPR(${JSON.stringify(name)},this.value)"><small class="muted">${x.date?`Last updated ${x.date}`:'No PR recorded yet'}</small></div>`}).join('')}</div></section>`; body+=`<section class="card"><h3>PR guidance</h3><ul class="checklist"><li>Record a genuine best controlled training weight, not a forced maximum.</li><li>Update it when you exceed your previous best with good technique.</li><li>Your weekly report will include weights used in Week 6 and beyond.</li></ul></section>`; return body; }
 function renderWeekAnalysis(w){
- const r=weekReport(w); if(!r) return '';
+ const r=weekReport(w); if(!r) return ''; const weightEntries=weekWeightEntries(w);
  return `<section class="card"><h3>End-of-week review</h3><p class="muted">Use this at the end of Week ${w} to review what you logged. It does not replace your physio's assessment.</p>
- <div class="grid2"><div class="stat"><small>Exercise completion</small><br><b>${r.complete}/${r.exercises}</b><br><small>${r.pct}%</small></div><div class="stat"><small>Logged sessions</small><br><b>${r.sessionCount}</b></div><div class="stat"><small>Avg logged pain</small><br><b>${r.avgPain}/10</b></div><div class="stat"><small>Avg next morning</small><br><b>${r.avgNext}/10</b></div><div class="stat"><small>Avg RPE</small><br><b>${r.avgRpe}/10</b></div></div>
+ <div class="grid2"><div class="stat"><small>Exercise completion</small><br><b>${r.complete}/${r.exercises}</b><br><small>${r.pct}%</small></div><div class="stat"><small>Logged sessions</small><br><b>${r.sessionCount}</b></div><div class="stat"><small>Avg logged pain</small><br><b>${r.avgPain}/10</b></div><div class="stat"><small>Avg next morning</small><br><b>${r.avgNext}/10</b></div><div class="stat"><small>Avg RPE</small><br><b>${r.avgRpe}/10</b></div><div class="stat"><small>Weights logged</small><br><b>${weightEntries}</b></div></div>
  <div class="timerBtns" style="margin-top:12px"><button class="primary" onclick="showWeekAnalysis('${w}')">Analyse Week ${w}</button><button class="smallbtn" onclick="exportWeekData('${w}')">Export Week ${w} data</button></div></section>`;
 }
 function showWeekAnalysis(w){
@@ -296,13 +315,13 @@ function showWeekAnalysis(w){
 }
 function exportWeekData(w){
  const wk=weeks[w]; if(!wk)return;
- const rows=[['Week','Day','Exercise','Target','Rest','Completed','Set checks','Exercise pain','Session pain before','Session pain during','Session pain after','Next morning pain','RPE','Notes']];
+ const rows=[['Week','Day','Exercise','Target','Rest','Weight (kg)','Completed','Set checks','Exercise pain','Session pain before','Session pain during','Session pain after','Next morning pain','RPE','Notes']];
  wk.days.forEach((d,i)=>{
    if(!d[2].length)return;
    const k=dayKey('w'+w,i),x=state[k]||{};
    d[2].forEach((e,j)=>{
      const count=setCountFromDose(e[1]),checks=getSetChecks(k,j,count);
-     rows.push([w,d[0],e[0],e[1],e[2],isExerciseComplete(k,j,e[1])?'Yes':'No',checks.map(v=>v?'1':'0').join('|'),((x.exercisePain||{})[j]??''),x.pb??'',x.pd??'',x.pa??'',x.nm??'',x.rpe??'',x.notes??'']);
+     rows.push([w,d[0],e[0],e[1],e[2],((x.weights||{})[j]??''),isExerciseComplete(k,j,e[1])?'Yes':'No',checks.map(v=>v?'1':'0').join('|'),((x.exercisePain||{})[j]??''),x.pb??'',x.pd??'',x.pa??'',x.nm??'',x.rpe??'',x.notes??'']);
    });
  });
  const csv=rows.map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
