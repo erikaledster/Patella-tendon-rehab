@@ -238,7 +238,7 @@ function sessionCard(k,title,subtitle,items,opts={}){
    body+=`<div class="exercise"><div class="row"><div class="ename">${e[0]}</div>${complete?'<span class="pill">COMPLETE</span>':''}</div>`;
    const targetRpe=(String(e[1]).match(/RPE\s*([0-9]+(?:\.[0-9]+)?)/i)||[])[1];
    body+=`<div class="dose">${e[1]} • <b>Rest:</b> ${e[2]}${targetRpe?` • <b>Target RPE:</b> ${targetRpe}`:''}</div>`;
-   const showWeight = currentWeek===6 && !/easy walk|mobility routine|warm-up walk|rest/i.test(e[0]);
+   const showWeight = String(currentWeek)==="6" && !/easy walk|mobility routine|warm-up walk|rest/i.test(e[0]);
    const exercisePain=((x.exercisePain||{})[j] ?? 0);
    const noPainSlider=/^(incline push-up|push-up or incline push-up|band row|bird dog|dead bug|pallof press|side plank|db bench press|seated cable row|lat pulldown|db shoulder press)$/i.test(e[0].trim());
    if(!noPainSlider) body+=`<div class="metric sliderMetric" style="margin:10px 0 0 0;background:#f8fafc"><div class="sliderHead"><label><b>Pain during exercise</b></label><b id="${k}-ep${j}-out">${exercisePain}/10</b></div><input type="range" min="0" max="10" step="0.5" value="${exercisePain}" oninput="setExercisePain('${k}',${j},this.value);document.getElementById('${k}-ep${j}-out').textContent=this.value+'/10'"></div>`;
