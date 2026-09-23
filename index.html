@@ -194,8 +194,10 @@ function toggleSet(k,j,setIndex,v){
 function setExercisePain(k,j,v){
  state[k]=state[k]||{}; state[k].exercisePain=state[k].exercisePain||{}; state[k].exercisePain[j]=v; save();
 }
-function setExerciseWeight(k,j,v){
- state[k]=state[k]||{};state[k].weights=state[k].weights||{};state[k].weights[j]=v;
+function setExerciseWeight(k,j,setIndex,v){
+ state[k]=state[k]||{};state[k].weights=state[k].weights||{};
+ if(!Array.isArray(state[k].weights[j])) state[k].weights[j]=[];
+ state[k].weights[j][setIndex]=v;
  const num=Number(v);
  const items=weeks[currentWeek]?.days?.[currentDay]?.[2]||[];
  const name=items[j]?.[0];
@@ -237,14 +239,17 @@ function sessionCard(k,title,subtitle,items,opts={}){
    const targetRpe=(String(e[1]).match(/RPE\s*([0-9]+(?:\.[0-9]+)?)/i)||[])[1];
    body+=`<div class="dose">${e[1]} • <b>Rest:</b> ${e[2]}${targetRpe?` • <b>Target RPE:</b> ${targetRpe}`:''}</div>`;
    const showWeight = currentWeek===6 && !/easy walk|mobility routine|warm-up walk|rest/i.test(e[0]);
-   if(showWeight){ const wt=((x.weights||{})[j]??''); body+=`<div class="metric" style="margin:10px 0 0 0;background:#f8fafc"><label><b>Weight used (kg)</b></label><input inputmode="decimal" type="number" min="0" step="0.5" placeholder="e.g. 20" value="${wt}" onchange="setExerciseWeight('${k}',${j},this.value)"></div>`;}
    const exercisePain=((x.exercisePain||{})[j] ?? 0);
    const noPainSlider=/^(incline push-up|push-up or incline push-up|band row|bird dog|dead bug|pallof press|side plank|db bench press|seated cable row|lat pulldown|db shoulder press)$/i.test(e[0].trim());
    if(!noPainSlider) body+=`<div class="metric sliderMetric" style="margin:10px 0 0 0;background:#f8fafc"><div class="sliderHead"><label><b>Pain during exercise</b></label><b id="${k}-ep${j}-out">${exercisePain}/10</b></div><input type="range" min="0" max="10" step="0.5" value="${exercisePain}" oninput="setExercisePain('${k}',${j},this.value);document.getElementById('${k}-ep${j}-out').textContent=this.value+'/10'"></div>`;
-   body+=`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">`;
+   body+=`<div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">`;
    for(let si=0;si<count;si++){
      const repText=String(e[1]).replace(/^\d+\s*[x×]\s*/i,'').trim();
-     body+=`<label style="display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:${checks[si]?'#f8e8f0':'#fff'};font-size:13px"><input type="checkbox" ${checks[si]?'checked':''} onchange="toggleSet('${k}',${j},${si},this.checked)" style="width:21px;height:21px;accent-color:var(--accent)"><span>Set ${si+1} <b>${repText}</b></span></label>`;
+     const setWeight=Array.isArray((x.weights||{})[j]) ? ((x.weights||{})[j][si]??'') : (si===0 ? ((x.weights||{})[j]??'') : '');
+     body+=`<div style="display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:${checks[si]?'#f8e8f0':'#fff'};font-size:13px">
+       <label style="display:flex;align-items:center;gap:6px;flex:1"><input type="checkbox" ${checks[si]?'checked':''} onchange="toggleSet('${k}',${j},${si},this.checked)" style="width:21px;height:21px;accent-color:var(--accent)"><span>Set ${si+1} <b>${repText}</b></span></label>
+       ${showWeight?`<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)"><span>kg</span><input inputmode="decimal" type="number" min="0" step="0.5" placeholder="Weight" value="${setWeight}" onchange="setExerciseWeight('${k}',${j},${si},this.value)" style="width:78px;border:1px solid #d1d5db;border-radius:8px;padding:7px;background:#fff;font-size:14px"></label>`:''}
+     </div>`;
    }
    body+=`</div></div>`;
  });
