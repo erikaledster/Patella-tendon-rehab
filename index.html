@@ -90,6 +90,37 @@ const weeks={
 ["Saturday","Recovery",[["Easy walk","Easy","—"],["Mobility routine","10–12 min","—"]]],["Sunday","Rest",[]]]}
 };
 
+// Add upper-body and core work to the existing rehab sessions without changing the knee-focused progression.
+function addAccessoryWork(){
+  const homeAccessories = {
+    1:[['Incline push-up','3 × 8–12','60 sec'],['Bird dog','3 × 8/side','45 sec']],
+    2:[['Incline push-up','3 × 10–12','60 sec'],['Dead bug','3 × 10/side','45 sec'],['Band row','3 × 12','60 sec']],
+    3:[['Incline push-up','3 × 10–15','60 sec'],['Side plank','3 × 20–30 sec/side','45 sec'],['Band row','3 × 12–15','60 sec']],
+    4:[['Push-up or incline push-up','3 × 8–12','60–90 sec'],['Pallof press','3 × 10/side','45–60 sec'],['Band row','3 × 12–15','60 sec']],
+    5:[['Push-up or incline push-up','3 × 8–12','60–90 sec'],['Side plank','3 × 30 sec/side','45 sec'],['Band row','3 × 12–15','60 sec']]
+  };
+  ['0.5',1,2,3,4,5].forEach(w=>{
+    const data=weeks[w]; if(!data) return;
+    data.days.forEach(d=>{
+      const day=String(d[0]).split(' ')[0];
+      if(!['Monday','Wednesday','Friday'].includes(day)) return;
+      const extras = w==='0.5'
+        ? (day==='Wednesday' ? [['Incline push-up','2 × 8–10','60 sec'],['Bird dog','2 × 6/side','45 sec']] : [['Incline push-up','2 × 10','60 sec'],['Dead bug','2 × 8/side','45 sec']])
+        : homeAccessories[w];
+      if(extras) d[2].push(...extras);
+    });
+  });
+  if(weeks[6]){
+    const gymExtras = {
+      'Monday':[['DB bench press','3 × 8–10 @ RPE 6–7','90 sec'],['Seated cable row','3 × 10–12 @ RPE 6–7','90 sec'],['Pallof press','3 × 10/side','45–60 sec']],
+      'Wednesday':[['Lat pulldown','3 × 10–12 @ RPE 6–7','90 sec'],['DB shoulder press','3 × 8–10 @ RPE 6','90 sec'],['Dead bug','3 × 10/side','45 sec']],
+      'Friday':[['DB bench press','3 × 8–10 @ RPE 7','90 sec'],['Seated cable row','3 × 10–12 @ RPE 7','90 sec'],['Pallof press','3 × 10/side','45–60 sec']]
+    };
+    weeks[6].days.forEach(d=>{ const day=String(d[0]).split(' ')[0]; if(gymExtras[day]) d[2].push(...gymExtras[day]); });
+  }
+}
+addAccessoryWork();
+
 const bridge={
 "Session 1 — Thu 24 Sep": [["Wall sit","4 × 30 sec","90 sec"],["Sit-to-stand","3 × 10","90 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 15","60 sec"],["Easy walk","10–15 min","—"]],
 "Session 2 — Sat 26 Sep": [["Wall sit","4 × 40 sec","90 sec"],["Bodyweight squat to chair","3 × 10","90 sec"],["Glute bridge","3 × 15","60 sec"],["Double-leg calf raise","3 × 20","60 sec"],["Easy walk","15–20 min","—"]]
@@ -193,7 +224,8 @@ function sessionCard(k,title,subtitle,items,opts={}){
    const targetRpe=(String(e[1]).match(/RPE\s*([0-9]+(?:\.[0-9]+)?)/i)||[])[1];
    body+=`<div class="dose">${e[1]} • <b>Rest:</b> ${e[2]}${targetRpe?` • <b>Target RPE:</b> ${targetRpe}`:''}</div>`;
    const exercisePain=((x.exercisePain||{})[j] ?? 0);
-   body+=`<div class="metric sliderMetric" style="margin:10px 0 0 0;background:#f8fafc"><div class="sliderHead"><label><b>Pain during exercise</b></label><b id="${k}-ep${j}-out">${exercisePain}/10</b></div><input type="range" min="0" max="10" step="0.5" value="${exercisePain}" oninput="setExercisePain('${k}',${j},this.value);document.getElementById('${k}-ep${j}-out').textContent=this.value+'/10'"></div>`;
+   const noPainSlider=/^(incline push-up|push-up or incline push-up|band row|bird dog|dead bug|pallof press|side plank|db bench press|seated cable row|lat pulldown|db shoulder press)$/i.test(e[0].trim());
+   if(!noPainSlider) body+=`<div class="metric sliderMetric" style="margin:10px 0 0 0;background:#f8fafc"><div class="sliderHead"><label><b>Pain during exercise</b></label><b id="${k}-ep${j}-out">${exercisePain}/10</b></div><input type="range" min="0" max="10" step="0.5" value="${exercisePain}" oninput="setExercisePain('${k}',${j},this.value);document.getElementById('${k}-ep${j}-out').textContent=this.value+'/10'"></div>`;
    body+=`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">`;
    for(let si=0;si<count;si++){
      const repText=String(e[1]).replace(/^\d+\s*[x×]\s*/i,'').trim();
