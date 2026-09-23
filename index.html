@@ -28,6 +28,8 @@ canvas{width:100%;height:190px;border:1px solid var(--line);border-radius:12px;b
 .timer{font-size:42px;text-align:center;font-variant-numeric:tabular-nums;margin:10px}.timerBtns{display:flex;gap:8px}.timerBtns button{flex:1}
 .footer{font-size:11px;color:var(--muted);text-align:center;padding:15px}.hidden{display:none}.weekTabs{display:flex;gap:7px;overflow:auto;padding-bottom:2px}.weekTabs button{border:0;background:#eef2f7;border-radius:10px;padding:9px 12px;font-weight:800;white-space:nowrap;color:#374151}.weekTabs button.active{background:var(--accent);color:#fff}.weekTimer{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
 @media(min-width:600px){.metrics{grid-template-columns:repeat(5,1fr)}.inputs{grid-template-columns:repeat(5,1fr)}}
+
+.runBlock{margin:12px 0;border:1px solid rgba(128,0,64,.14);border-radius:12px;overflow:hidden;background:#fff7fb}.runBlockTitle{font-weight:800;font-size:.78rem;letter-spacing:.06em;padding:9px 12px;background:#f4d7e5;color:#7d174b}.runBlockText{padding:11px 12px;line-height:1.5;color:#3f2733}.runBlock+.runBlock{margin-top:10px}
 </style>
 </head>
 <body>
@@ -244,7 +246,18 @@ function renderRunning(){
    let globalIndex=running.indexOf(r); const k="run"+globalIndex, x=state[k]||{};
    body+=`<section class="card"><div class="row"><div style="flex:1"><h2>${r.day}</h2><div class="muted">${r.stage} — ${r.title}</div></div><span class="tag">${r.day==='Monday'?'SESSION 1':'SESSION 2'}</span></div>
    <div class="exercise"><div class="row"><input type="checkbox" ${x.done?'checked':''} onchange="setv('${k}','done',this.checked);render()"><div class="ename">Complete ${r.stage}</div></div>
-   <p class="muted" style="margin:10px 0 5px"><b>Warm-up / session:</b> ${r.session}</p><p class="muted"><b>Progression note:</b> ${r.note}</p>
+   ${(() => {
+     const parts = r.session.split(/\s+(?=Main:|Cool-down:)/);
+     const warm = parts[0].replace(/^Warm-up:\s*/, '').trim();
+     const mainPart = parts.find(p => p.startsWith('Main:'));
+     const coolPart = parts.find(p => p.startsWith('Cool-down:'));
+     const main = mainPart ? mainPart.replace(/^Main:\s*/, '').trim() : '';
+     const cool = coolPart ? coolPart.replace(/^Cool-down:\s*/, '').trim() : '';
+     return `<div class="runBlock"><div class="runBlockTitle">WARM-UP</div><div class="runBlockText">${warm}</div></div>
+       <div class="runBlock"><div class="runBlockTitle">MAIN SESSION</div><div class="runBlockText">${main}</div></div>
+       <div class="runBlock"><div class="runBlockTitle">COOL-DOWN</div><div class="runBlockText">${cool}</div></div>`;
+   })()}
+   <p class="muted"><b>Progression note:</b> ${r.note}</p>
    <details><summary style="font-weight:700">Log response</summary>${metrics(k)}</details></div></section>`;
  });
  let done=items.filter(r=>state["run"+running.indexOf(r)]?.done).length;
