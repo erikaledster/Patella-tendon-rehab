@@ -264,6 +264,51 @@ function weekDate(w){
  let d=new Date(homeStart+"T00:00:00");d.setDate(d.getDate()+(Number(w)-1)*7);
  return d.toLocaleDateString("en-GB",{day:"numeric",month:"short"})
 }
+
+function weekReport(w){
+ const wk=weeks[w]; if(!wk) return null;
+ let exercises=0, complete=0, painVals=[], rpeVals=[], nextVals=[], sessionCount=0, daysLogged=0;
+ wk.days.forEach((d,i)=>{
+   if(!d[2].length) return;
+   const k=dayKey("w"+w,i), x=state[k]||{};
+   let dayHasLog=false;
+   d[2].forEach((e,j)=>{
+     exercises++;
+     if(isExerciseComplete(k,j,e[1])) complete++;
+     const ep=Number((x.exercisePain||{})[j]); if(!Number.isNaN(ep)) painVals.push(ep);
+   });
+   ['pb','pd','pa','nm','rpe'].forEach(key=>{const v=Number(x[key]); if(!Number.isNaN(v)){ if(key==='nm') nextVals.push(v); else if(key==='rpe') rpeVals.push(v); else painVals.push(v); dayHasLog=true; }});
+   if(dayHasLog){sessionCount++;daysLogged++;}
+ });
+ const avg=a=>a.length?(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1):'—';
+ return {exercises,complete,pct:exercises?Math.round(complete/exercises*100):0,avgPain:avg(painVals),avgRpe:avg(rpeVals),avgNext:avg(nextVals),sessionCount,daysLogged};
+}
+function renderWeekAnalysis(w){
+ const r=weekReport(w); if(!r) return '';
+ return `<section class="card"><h3>End-of-week review</h3><p class="muted">Use this at the end of Week ${w} to review what you logged. It does not replace your physio's assessment.</p>
+ <div class="grid2"><div class="stat"><small>Exercise completion</small><br><b>${r.complete}/${r.exercises}</b><br><small>${r.pct}%</small></div><div class="stat"><small>Logged sessions</small><br><b>${r.sessionCount}</b></div><div class="stat"><small>Avg logged pain</small><br><b>${r.avgPain}/10</b></div><div class="stat"><small>Avg next morning</small><br><b>${r.avgNext}/10</b></div><div class="stat"><small>Avg RPE</small><br><b>${r.avgRpe}/10</b></div></div>
+ <div class="timerBtns" style="margin-top:12px"><button class="primary" onclick="showWeekAnalysis('${w}')">Analyse Week ${w}</button><button class="smallbtn" onclick="exportWeekData('${w}')">Export Week ${w} data</button></div></section>`;
+}
+function showWeekAnalysis(w){
+ const r=weekReport(w); if(!r)return;
+ let text=`WEEK ${w} REHAB REVIEW\n\nExercise completion: ${r.complete}/${r.exercises} (${r.pct}%)\nLogged sessions: ${r.sessionCount}\nAverage logged pain: ${r.avgPain}/10\nAverage next-morning pain: ${r.avgNext}/10\nAverage RPE: ${r.avgRpe}/10\n\nUse these figures as a record of your week and discuss any concerning symptom trends with your physio.`;
+ alert(text);
+}
+function exportWeekData(w){
+ const wk=weeks[w]; if(!wk)return;
+ const rows=[['Week','Day','Exercise','Target','Rest','Completed','Set checks','Exercise pain','Session pain before','Session pain during','Session pain after','Next morning pain','RPE','Notes']];
+ wk.days.forEach((d,i)=>{
+   if(!d[2].length)return;
+   const k=dayKey('w'+w,i),x=state[k]||{};
+   d[2].forEach((e,j)=>{
+     const count=setCountFromDose(e[1]),checks=getSetChecks(k,j,count);
+     rows.push([w,d[0],e[0],e[1],e[2],isExerciseComplete(k,j,e[1])?'Yes':'No',checks.map(v=>v?'1':'0').join('|'),((x.exercisePain||{})[j]??''),x.pb??'',x.pd??'',x.pa??'',x.nm??'',x.rpe??'',x.notes??'']);
+   });
+ });
+ const csv=rows.map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+ const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=`patella-rehab-week-${w}-data.csv`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+}
 function renderWeek(){
  const w=weeks[currentWeek], dayIndex=Math.max(0,Math.min((w?.days?.length||1)-1,currentDay)); currentDay=dayIndex;
  const activeDay=w.days[dayIndex];
@@ -282,6 +327,7 @@ function renderWeek(){
  if(currentWeek===4 && String(d[0]).startsWith("Saturday")) body+=`<section class="card"><h3>Week 4 checkpoint</h3><p class="muted">Complete the Saturday test as prescribed, then use the mobility routine if symptoms are settled.</p></section>`;
  if(currentWeek===5 && dayIndex===0)body+=`<section class="card warning"><h3>Week 5 testing</h3><p class="muted">Review resting pain, strength tolerance, hopping tolerance and next-morning response with your physio before progressing into running.</p></section>`;
  if(currentWeek===6)body+=`<section class="card"><h3>Gym progression rule</h3><p class="muted">If all sets are controlled and symptoms remain stable, add a small amount of weight next time (for example 2.5–5%) rather than lots of extra volume. If symptoms flare, hold or reduce the load.</p></section>`;
+ body+=renderWeekAnalysis(currentWeek);
  body+=`<section class="card"><div class="row"><button class="smallbtn" onclick="changeDay(-1)">← Previous day</button><button class="smallbtn" onclick="changeDay(1)">Next day →</button></div></section>`; return body;
 }
 function changeDay(n){ const max=(weeks[currentWeek]?.days?.length||1)-1; currentDay=Math.max(0,Math.min(max,currentDay+n)); localStorage.setItem("rehabDay",currentDay); render(); }
